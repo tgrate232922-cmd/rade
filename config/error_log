@@ -1,0 +1,4 @@
+[16-Dec-2024 09:01:47 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/bevanchc/movastark.com/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/bevanchc/movastark.com/config/app.php on line 18
