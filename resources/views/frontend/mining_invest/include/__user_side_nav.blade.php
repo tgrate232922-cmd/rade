@@ -32,6 +32,10 @@
                 <a href="{{route('user.schema')}}"><i
                         class="anticon anticon-check-square"></i><span>{{ __('All Schema') }}</span></a>
             </li>
+            <li class="side-nav-item {{ isActive('user.copy-trade*') }}">
+                <a href="{{ route('user.copy-trade.index') }}"><i
+                        class="anticon anticon-line-chart"></i><span>{{ __('Copy Trade') }}</span></a>
+            </li>
             <li class="side-nav-item {{ isActive('user.invest*') }}">
                 <a href="{{ route('user.invest-logs') }}"><i
                         class="anticon anticon-copy"></i><span>{{ __('Schema Logs') }}</span></a>
