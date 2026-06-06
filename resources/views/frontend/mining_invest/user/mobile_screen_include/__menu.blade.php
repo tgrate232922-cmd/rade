@@ -8,6 +8,9 @@
     <a href="{{ route('user.schema') }}" class="{{ isActive('user.schema*') }}">
         <i icon-name="box"></i>
     </a>
+    <a href="{{ route('user.copy-trade.index') }}" class="{{ isActive('user.copy-trade*') }}">
+        <i icon-name="line-chart"></i>
+    </a>
     <a href="{{ route('user.referral') }}" class="{{ isActive('user.referral*') }}">
         <i icon-name="gift"></i>
     </a>
