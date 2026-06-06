@@ -1,7 +1,7 @@
 
 <div class="col-xxl-6 col-xl-6 col-lg-6">
     <div class="rock-single-input">
-        <label class="input-label" for="">{{ __('Method Name:') }}</label>
+        <label class="input-label" for="">{{ __('Crypto Name') }}</label>
         <div class="input-field">
             <input type="text" class="box-input" name="method_name" placeholder="eg. Withdraw Method - USD" value="{{ $withdrawMethod->name .'-'. $withdrawMethod->currency}}">
         </div>

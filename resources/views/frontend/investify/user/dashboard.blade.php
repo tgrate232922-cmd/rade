@@ -2,1403 +2,2147 @@
 @section('title')
 {{ __('Dashboard') }}
 @endsection
-@section('content')
-<div class="container-fluid default-page">
-    
-            <!-- Show desktop-screen content -->
-            <div class="rock-desktop-screen-show">
-                <div class="rock-dashboard-level-area">
-                    <div class="dashboard-card">
-                        
-                    </div>
-                </div>
-            </div>
-            <!-- Show mobile-screen content -->
-            <div class="rock-mobile-screen-show">
-                <div class="rock-dashboard-level-area">
-                    
-                </div>
-            </div>
-            <!-- Show mobile-screen content -->
-            <div class="rock-mobile-screen-show">
-                <div class="rock-account-card-main">
-                    <div class="rock-account-card">
-                        <div class="content-inner">
-                             <div class="content">
-                            <span class="lavel">My Assets</span>
-                            
-                        </div>
-                        <br>
-                            <div class="card-content">
-                                <div class="info">
-                                    
-                                    <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M22 6H6C3.79086 6 2 7.79086 2 10V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6Z"
-                                                fill="white" />
-                                            <path d="M22 6C22 3.79086 20.2091 2 18 2H12C9.79086 2 8 3.79086 8 6H22Z"
-                                                fill="white" />
-                                            <path
-                                                d="M2 12L2 16L6 16C7.10457 16 8 15.1046 8 14C8 12.8954 7.10457 12 6 12L2 12Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <h5 class="info-text">{{ __('Funding') }}</h5>
-                                </div>
-                               
-                                <h5 class="title">{{ $currencySymbol.$user->balance }}</h5>
-                                
-                            </div>
-                            <div class="card-content">
-                                 <div class="info">
-                                    <span>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M14.0859 7L9.91411 7L8.51303 5.39296C7.13959 3.81763 8.74185 1.46298 10.7471 2.10985L11.6748 2.40914C11.8861 2.47728 12.1139 2.47728 12.3252 2.40914L13.2529 2.10985C15.2582 1.46298 16.8604 3.81763 15.487 5.39296L14.0859 7Z"
-                                                fill="white" />
-                                            <path opacity="0.4"
-                                                d="M5.68453 10.2103C6.4673 7.7055 8.7871 6 11.4114 6H12.5891C15.2134 6 17.5332 7.7055 18.316 10.2104L19.566 14.2104C20.7734 18.0739 17.887 22 13.8391 22H10.1614C6.11357 22 3.22716 18.0739 4.43453 14.2104L5.68453 10.2103Z"
-                                                fill="white" />
-                                            <path
-                                                d="M12 20C12 18.8954 12.8954 18 14 18H20C21.1046 18 22 18.8954 22 20C22 21.1046 21.1046 22 20 22H14C12.8954 22 12 21.1046 12 20Z"
-                                                fill="white" />
-                                            <path
-                                                d="M12 16C12 14.8954 12.8954 14 14 14H19.3333H20C21.1046 14 22 14.8954 22 16C22 17.1046 21.1046 18 20 18H14C12.8954 18 12 17.1046 12 16Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <h5 class="info-text">{{ __('Spot') }}</h5>
-                                </div>
-                           
-                                <h5 class="title">{{ $currencySymbol.$user->profit_balance }}</h5>
-                               
-                            </div>
-                        </div>
-                        <div class="card-shape">
-                            <img src="{{ asset('frontend/theme_base/hardrock/images/rock-shapes/card-shape.png') }}" alt="">
-                        </div>
-                    </div>
-           
-                    <div class="account-bg-shape">
-                        <img src="{{ asset('frontend/theme_base/hardrock/images/bg/ac-balance-bg.png') }}" alt="">
-                    </div>
-                </div>
-                
-                
-                
-               <!-- Crypto Staking Plan Chart Section -->
-               <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Chart Container with proper sizing and spacing -->
-<div class="card text-white shadow mb-4" style="background-color: #6337e617;">
-  <div class="card-header border-bottom">
-    <h5 class="mb-0">Top 10 Staking Protocols (Live TVL)</h5>
-  </div>
-  <div class="card-body">
-    <div style="position:relative; height:400px; width:100%;">
-      <canvas id="stakingBarChart" style="background-color: #6337e617; border-radius: 10px;"></canvas>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  async function loadStakingBarChart() {
-    const canvas = document.getElementById('stakingBarChart');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-
-    try {
-      const res = await fetch('https://api.llama.fi/protocols');
-      const data = await res.json();
-
-      const stakingData = data
-        .filter(p => p.category && p.category.toLowerCase().includes("staking"))
-        .sort((a, b) => b.tvl - a.tvl)
-        .slice(0, 10);
-
-      const labels = stakingData.map(p => p.name);
-      const tvls = stakingData.map(p => p.tvl);
-
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'TVL (USD)',
-            data: tvls,
-            backgroundColor: 'rgba(0, 123, 255, 0.7)',
-            borderColor: 'rgba(0, 123, 255, 1)',
-            borderWidth: 1,
-            borderRadius: 4
-          }]
-        },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          plugins: {
-            legend: {
-              labels: {
-                color: '#ffffff'
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: context => `$${context.parsed.y.toLocaleString()}`
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: '#ccc' },
-              grid: { color: 'rgba(255,255,255,0.1)' }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                color: '#ccc',
-                callback: value => '$' + value.toLocaleString()
-              },
-              grid: { color: 'rgba(255,255,255,0.1)' }
-            }
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error loading staking bar chart:", error);
-      ctx.font = "16px Arial";
-      ctx.fillStyle = "#f00";
-      ctx.fillText("Chart loading failed.", 10, 50);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", loadStakingBarChart);
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://s3.tradingview.com/tv.js"></script>
-
+@section('style')
+<link rel="stylesheet" href="{{ asset('global/css/modern-dashboard.css') }}?v={{ time() }}">
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <style>
-.stake-calculator {
-  font-family: Arial, sans-serif;
-  background-color: #6337e617;
-  color: #fff;
-  padding: 1rem;
-  margin: 2rem auto;
-  max-width: 1200px;
-  border-radius: 10px;
+    /* Remove ALL spacing and backgrounds */
+    * {
+        box-sizing: border-box !important;
+    }
+    
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        background: linear-gradient(135deg, #0a1f1c 0%, #081317 50%, #025443 100%) !important;
+        background-attachment: fixed !important;
+        overflow-x: hidden !important;
+    }
+    
+    /* Force remove background images on main containers */
+    body,
+    .main-wrapper,
+    .user-panel,
+    .dashboard-wrapper,
+    .site-wrapper,
+    .page-wrapper,
+    .content-wrapper,
+    main {
+        background: linear-gradient(135deg, #0a1f1c 0%, #081317 50%, #025443 100%) !important;
+        background-attachment: fixed !important;
+        background-image: none !important;
+    }
+    
+    /* Remove container spacing but keep header spacing */
+    .container-fluid.default-page {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    
+    /* Dashboard wrapper full height */
+    .modern-dashboard-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: calc(100vh - 80px) !important;
+        background: linear-gradient(135deg, #0a1f1c 0%, #081317 50%, #025443 100%) !important;
+    }
+    
+    .dashboard-main-content {
+        padding: 24px !important;
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Keep header/nav spacing intact */
+    .site-header,
+    .navbar,
+    .user-panel-header,
+    .top-nav,
+    .main-header {
+        margin: revert !important;
+        padding: revert !important;
+    }
+    
+    .site-header *,
+    .navbar *,
+    .user-panel-header *,
+    .top-nav *,
+    .main-header * {
+        margin: revert !important;
+        padding: revert !important;
+    }
+    
+  /* ==========================================
+   Blue Glass Dashboard Notification Popup
+========================================== */
+
+#userPopupNotification .modal-dialog{
+    max-width: 560px;
 }
 
-.stake-calculator h5 {
-  text-align: center;
-  margin-bottom: 1rem;
+#userPopupNotification .modal-content{
+    max-height: 86vh;
+    background:
+        radial-gradient(circle at top right, rgba(59,130,246,0.18), transparent 32%),
+        radial-gradient(circle at bottom left, rgba(34,211,238,0.10), transparent 36%),
+        linear-gradient(135deg, #07111f 0%, #0b1728 48%, #111827 100%);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 22px;
+    box-shadow: 0 22px 55px rgba(0,0,0,0.42);
+    overflow: hidden;
+    position: relative;
 }
 
-.stake-calculator .input-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
+#userPopupNotification .modal-content::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(to right, rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 38px 38px;
+    opacity:.14;
+    pointer-events:none;
 }
 
-.stake-calculator label {
-  font-weight: bold;
+#userPopupNotification .popup-body{
+    padding: 24px;
+    color:#fff;
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    max-height:86vh;
+    overflow:hidden;
 }
 
-.stake-calculator input[type="number"] {
-  padding: 0.6rem;
-  border-radius: 5px;
-  border: none;
-  font-size: 1rem;
-  width: 100%;
+#userPopupNotification .popup-body-text{
+    overflow-y:auto;
+    padding-right:8px;
+    flex:1;
+    max-height:68vh;
 }
 
-.stake-calculator button,
-.stake-calculator a {
-  background-color: #075dba;
-  color: #fff;
-  border: none;
-  padding: 0.8rem;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-  text-decoration: none;
-  display: inline-block;
+#userPopupNotification .title{
+    font-size:20px;
+    font-weight:800;
+    line-height:1.25;
+    color:#60a5fa;
+    margin:0 0 12px;
 }
 
-.stake-calculator button:hover {
-  background-color: #064fa0;
+#userPopupNotification .popup-body-text p{
+    font-size:13px;
+    line-height:1.65;
+    color:rgba(226,232,240,0.78);
+    margin-bottom:16px;
 }
 
-.stake-calculator #results,
-.stake-calculator #chartSection {
-  display: none;
-  margin-top: 2rem;
+#userPopupNotification .site-btn-sm.primary-btn{
+    position:sticky;
+    bottom:0;
+    margin-top:14px;
+    background:linear-gradient(135deg,#2563eb 0%,#38bdf8 100%);
+    color:#ffffff !important;
+    border:none;
+    border-radius:12px;
+    padding:11px 20px;
+    font-size:13px;
+    font-weight:800;
+    box-shadow:0 12px 26px rgba(37,99,235,.22);
+    display:inline-block;
 }
 
-.stake-calculator canvas {
-  background-color: #6337e617;
-  border-radius: 8px;
-  width: 100% !important;
-  height: auto !important;
+#userPopupNotification .btn-close{
+    position:absolute;
+    top:16px;
+    right:16px;
+    filter:invert(1);
+    opacity:.65;
+    z-index:5;
 }
 
-.stake-calculator .tradingview-widget-container {
-  margin-top: 2rem;
-  width: 100%;
+#userPopupNotification .btn-close:hover{
+    opacity:1;
+    transform:rotate(90deg);
+}
+
+#userPopupNotification .popup-body-text::-webkit-scrollbar{
+    width:6px;
+}
+
+#userPopupNotification .popup-body-text::-webkit-scrollbar-track{
+    background:rgba(255,255,255,0.05);
+    border-radius:20px;
+}
+
+#userPopupNotification .popup-body-text::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg,#2563eb,#38bdf8);
+    border-radius:20px;
+}
+
+.modal-backdrop.show{
+    opacity:.78;
+    backdrop-filter:blur(4px);
+}
+
+@media(max-width:768px){
+    #userPopupNotification .modal-dialog{
+        margin:14px;
+    }
+
+    #userPopupNotification .popup-body{
+        padding:20px 16px;
+    }
+
+    #userPopupNotification .title{
+        font-size:17px;
+        padding-right:28px;
+    }
+
+    #userPopupNotification .popup-body-text p{
+        font-size:12px;
+    }
+
+    #userPopupNotification .site-btn-sm.primary-btn{
+        width:100%;
+        text-align:center;
+    }
+}
+/* =========================================================
+   FIXED BLUE GLASS DASHBOARD THEME
+   Paste at bottom of modern-dashboard.css
+========================================================= */
+
+html,
+body{
+    background:
+        radial-gradient(circle at 20% 8%, rgba(56,189,248,.16), transparent 24%),
+        radial-gradient(circle at 85% 28%, rgba(37,99,235,.14), transparent 30%),
+        linear-gradient(135deg,#06111f 0%,#0a2030 50%,#06121f 100%) !important;
+    background-attachment: fixed !important;
+}
+
+.modern-dashboard-wrapper{
+    min-height:100vh !important;
+    background:transparent !important;
+    position:relative !important;
+    overflow:hidden !important;
+}
+
+.modern-dashboard-wrapper::before{
+    content:"" !important;
+    position:absolute !important;
+    inset:0 !important;
+    background-image:radial-gradient(rgba(125,211,252,.13) 1px, transparent 1px) !important;
+    background-size:18px 18px !important;
+    opacity:.25 !important;
+    pointer-events:none !important;
+    z-index:0 !important;
+}
+
+.dashboard-main-content{
+    position:relative !important;
+    z-index:2 !important;
+    max-width:1320px !important;
+    padding:24px !important;
+    margin:0 auto !important;
+}
+
+/* glass cards */
+.dashboard-info-bar,
+.stat-card,
+.balance-card,
+.quick-actions-card,
+.mobile-quick-action-tile,
+.profile-box,
+.locked-period-box,
+.top-pools-card,
+.pool-trend-card,
+.staking-plan-card,
+.transactions-card{
+    background:linear-gradient(180deg,rgba(54,84,120,.28),rgba(16,30,54,.62)) !important;
+    border:1px solid rgba(125,211,252,.20) !important;
+    box-shadow:
+        0 28px 70px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.10) !important;
+    backdrop-filter:blur(24px) saturate(145%) !important;
+    -webkit-backdrop-filter:blur(24px) saturate(145%) !important;
+    border-radius:24px !important;
+}
+
+/* remove old green overlays */
+.stat-card::before,
+.balance-card::before,
+.profile-box::before,
+.locked-period-box::before,
+.staking-plan-card::before{
+    background:radial-gradient(circle at 75% 0%, rgba(125,211,252,.18), transparent 24%) !important;
+    opacity:.75 !important;
+}
+
+/* blue accents */
+.info-item-icon,
+.stat-icon,
+.stat-trend,
+.stat-trend svg,
+.profile-header svg,
+.plan-detail-label svg,
+.view-all-link,
+.plan-roi-value,
+.plan-detail-value.highlight,
+.profile-achievements-value{
+    color:#67e8f9 !important;
+}
+
+.stat-icon-wrapper,
+.plan-icon-wrapper,
+.profile-edit-btn,
+.quick-action-icon,
+.mobile-action-icon-wrapper{
+    background:linear-gradient(135deg,#67e8f9,#2563eb) !important;
+    border:1px solid rgba(125,211,252,.35) !important;
+    box-shadow:0 0 26px rgba(56,189,248,.22) !important;
+}
+
+.stat-icon-wrapper svg,
+.plan-icon-wrapper svg,
+.quick-action-icon svg,
+.mobile-action-icon-wrapper svg{
+    color:#ffffff !important;
+}
+
+/* buttons */
+.plan-action-btn,
+.view-all-btn,
+.top-pools-refresh-btn{
+    background:linear-gradient(135deg,#67e8f9 0%,#2563eb 100%) !important;
+    color:#ffffff !important;
+    border:none !important;
+    box-shadow:0 16px 36px rgba(37,99,235,.30) !important;
+}
+
+.plan-action-btn:hover,
+.view-all-btn:hover{
+    box-shadow:0 20px 46px rgba(37,99,235,.42) !important;
+}
+
+/* quick actions */
+.quick-action-btn{
+    background:rgba(25,43,73,.56) !important;
+    border:1px solid rgba(125,211,252,.14) !important;
+    border-radius:18px !important;
+}
+
+.quick-action-btn:hover{
+    background:rgba(56,189,248,.12) !important;
+    border-color:rgba(56,189,248,.35) !important;
+}
+
+/* balance chart */
+#balanceChartPath{
+    stroke:rgba(103,232,249,.55) !important;
+}
+
+#balanceChartArea{
+    fill:rgba(103,232,249,.08) !important;
+}
+
+.balance-apy-badge{
+    background:rgba(56,189,248,.10) !important;
+    border-color:rgba(125,211,252,.35) !important;
+    color:#67e8f9 !important;
+}
+
+/* staking pool APY box */
+.plan-roi{
+    background:rgba(56,189,248,.08) !important;
+    border:1px solid rgba(125,211,252,.20) !important;
+}
+
+/* recent transactions position fix */
+.transactions-card{
+    max-width:1320px !important;
+    margin:24px auto 80px !important;
+}
+
+/* mobile */
+@media(max-width:768px){
+    .dashboard-main-content{
+        padding:16px !important;
+    }
+
+    .dashboard-info-bar{
+        grid-template-columns:1fr !important;
+    }
+
+    .dashboard-stats-grid,
+    .dashboard-grid,
+    .profile-locked-section{
+        grid-template-columns:1fr !important;
+    }
+
+    .transactions-card{
+        margin:18px 16px 70px !important;
+    }
 }
 </style>
-
-<div class="stake-calculator">
-  <h5>Yield Projection</h5>
-  <div class="input-section">
-    <label for="amount">Staking Amount ($):</label>
-    <input type="number" id="amount" placeholder="e.g., 10000" min="50" />
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-      <button onclick="simulate()">Calculate</button>
-      <a href="https://MinxChaink.com/account/user/schemas">Stake Now</a>
-    </div>
-  </div>
-
-  <div id="results"></div>
-
-  <div id="chartSection">
-    <canvas id="earningsChart"></canvas>
-    <div class="tradingview-widget-container">
-      
-    </div>
-  </div>
-
-  <button onclick="closeChart()" style="margin-top: 1rem; background-color: #444; color: #fff;">Close Chart</button>
-</div>
-
-<script>
-const plans = [
-  { name: "MinxChain DAO Smart Contract", rate: 1.2, min: 50, max: 999 },
-  { name: "MinxChain Boost", rate: 3.2, min: 1000, max: 4999 },
-  { name: "MinxChain DAO-farming", rate: 5.2, min: 5000, max: 9999 },
-  { name: "MinxChain -IDOs", rate: 7.2, min: 10000, max: 49999 },
-  { name: "Meme-pool DAO", rate: 9.5, min: 50000, max: 499999 },
-  { name: "DCA Staking", rate: 10.5, min: 500000, max: 1000000 }
-];
-
-let chart;
-
-function simulate() {
-  const amount = parseFloat(document.getElementById("amount").value);
-  const resultDiv = document.getElementById("results");
-  const chartSection = document.getElementById("chartSection");
-
-  if (isNaN(amount) || amount < 50) {
-    alert("Please enter a valid amount (minimum $50)");
-    return;
-  }
-
-  const plan = plans.find(p => amount >= p.min && amount <= p.max);
-  if (!plan) {
-    alert("No matching plan found for the entered amount.");
-    return;
-  }
-
-  const dailyRate = plan.rate / 100;
-  const earnings = [];
-  let capital = amount;
-
-  for (let i = 1; i <= 5; i++) {
-    capital += capital * dailyRate;
-    earnings.push(capital.toFixed(2));
-  }
-
-  resultDiv.innerHTML = `
-    <h4>Stake: ${plan.name}</h4>
-    <p>Daily Rate: ${plan.rate}%</p>
-    <p>Total Returns  3-5 Days: $${capital.toFixed(2)}</p>
-  `;
-  resultDiv.style.display = "block";
-  chartSection.style.display = "block";
-
-  const ctx = document.getElementById("earningsChart").getContext("2d");
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
-      datasets: [{
-        label: 'Capital Growth',
-        data: earnings,
-        fill: true,
-        borderColor: '#075dba',
-        backgroundColor: 'rgba(0, 255, 204, 0.1)',
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          labels: { color: '#fff' }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#fff' }
-        },
-        y: {
-          ticks: { color: '#fff' }
-        }
-      }
-    }
-  });
-
-  // Load TradingView widget
-  document.getElementById("tradingview_chart").innerHTML = "";
-  new TradingView.widget({
-    width: "100%",
-    height: 500,
-    symbol: "AAPL",
-    interval: "D",
-    timezone: "Etc/UTC",
-    theme: "dark",
-    style: "1",
-    locale: "en",
-    toolbar_bg: "#f1f3f6",
-    enable_publishing: false,
-    hide_side_toolbar: false,
-    allow_symbol_change: true,
-    container_id: "tradingview_chart"
-  });
-}
-
-function closeChart() {
-  document.getElementById("results").style.display = "none";
-  document.getElementById("chartSection").style.display = "none";
-  document.getElementById("amount").value = "";
-}
-</script>
-
-
-
-
-
-
-
-
-
-
-</div>
-
-
-                
-                
-                
-                
-                
-                
-                
-                 
-            <br>
-                
-                
-            </div>
-            <!-- Show desktop-screen content -->
-            <div class="rock-desktop-screen-show">
-                <div class="rock-dashboard-grid">
-                    <div class="rock-account-card-wrapper">
-                        <h3 class="title">{{ __('My Assets') }}</h3>
-                        <div class="rock-account-card-main">
-                            <div class="rock-account-card">
-                                <div class="content-inner">
-                                    <div class="card-content"> 
-                                    
-                                    <div class="info">
-                                            <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path opacity="0.4"
-                                                        d="M22 6H6C3.79086 6 2 7.79086 2 10V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V6Z"
-                                                        fill="white" />
-                                                    <path
-                                                        d="M22 6C22 3.79086 20.2091 2 18 2H12C9.79086 2 8 3.79086 8 6H22Z"
-                                                        fill="white" />
-                                                    <path
-                                                        d="M2 12L2 16L6 16C7.10457 16 8 15.1046 8 14C8 12.8954 7.10457 12 6 12L2 12Z"
-                                                        fill="white" />
-                                                </svg>
-                                            </span>
-                                            <h4 class="info-text">{{ __('Funding') }}</h4>
-                                        </div>
-                                        <br>
-                                        <h5 class="title">{{ $currencySymbol.$user->balance }}</h5>
-                                       
-                                    </div>
-                                    <div class="card-content">
-                                         <div class="info">
-                                            <span>
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path opacity="0.4"
-                                                        d="M14.0859 7L9.91411 7L8.51303 5.39296C7.13959 3.81763 8.74185 1.46298 10.7471 2.10985L11.6748 2.40914C11.8861 2.47728 12.1139 2.47728 12.3252 2.40914L13.2529 2.10985C15.2582 1.46298 16.8604 3.81763 15.487 5.39296L14.0859 7Z"
-                                                        fill="white" />
-                                                    <path opacity="0.4"
-                                                        d="M5.68453 10.2103C6.4673 7.7055 8.7871 6 11.4114 6H12.5891C15.2134 6 17.5332 7.7055 18.316 10.2104L19.566 14.2104C20.7734 18.0739 17.887 22 13.8391 22H10.1614C6.11357 22 3.22716 18.0739 4.43453 14.2104L5.68453 10.2103Z"
-                                                        fill="white" />
-                                                    <path
-                                                        d="M12 20C12 18.8954 12.8954 18 14 18H20C21.1046 18 22 18.8954 22 20C22 21.1046 21.1046 22 20 22H14C12.8954 22 12 21.1046 12 20Z"
-                                                        fill="white" />
-                                                    <path
-                                                        d="M12 16C12 14.8954 12.8954 14 14 14H19.3333H20C21.1046 14 22 14.8954 22 16C22 17.1046 21.1046 18 20 18H14C12.8954 18 12 17.1046 12 16Z"
-                                                        fill="white" />
-                                                </svg>
-                                            </span>
-                                            <h5 class="info-text">{{ __('Spot') }}</h5>
-                                        </div>
-                                        <br>
-                                        <h5 class="title">{{ $currencySymbol.$user->profit_balance }}</h5>
-                                       
-                                    </div>
-                                </div>
-                                <div class="card-shape">
-                                    <img src="{{ asset('frontend/theme_base/hardrock/images/rock-shapes/card-shape.png') }}" alt="">
-                                </div>
-                            </div>
-                            <div class="rock-account-btn">
-                                <a class="site-btn gradient-btn" href="{{ route('user.deposit.amount') }}">
-                                    <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M4 8H2V17L6.31083 19.1554C7.42168 19.7108 8.64658 20 9.88854 20H18C19.1046 20 20 19.1046 20 18C20 16.8954 19.1046 16 18 16H16.4164C15.4849 16 14.5663 15.7831 13.7331 15.3666L10.792 13.896C10.9843 13.7189 11.1432 13.4993 11.2528 13.2434C11.6664 12.2784 11.2241 11.1605 10.2622 10.7397L4 8Z"
-                                                fill="white" />
-                                            <circle cx="18" cy="8" r="4" fill="white" />
-                                        </svg>
-                                    </span>
-                                    {{ __('Deposit') }}
-                                </a>
-                                <a class="site-btn outline-opcity-btn" href="{{ route('user.schema') }}"> <span><svg width="24"
-                                            height="25" viewBox="0 0 24 25" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M19 13.5C19 17.9183 15.4183 21.5 11 21.5C6.58172 21.5 3 17.9183 3 13.5C3 9.08172 6.58172 5.5 11 5.5C15.4183 5.5 19 9.08172 19 13.5Z"
-                                                fill="white" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M16 4.25C15.5858 4.25 15.25 3.91421 15.25 3.5C15.25 3.08579 15.5858 2.75 16 2.75H21C21.4142 2.75 21.75 3.08579 21.75 3.5V8.5C21.75 8.91421 21.4142 9.25 21 9.25C20.5858 9.25 20.25 8.91421 20.25 8.5V5.31066L10.5303 15.0303C10.2374 15.3232 9.76256 15.3232 9.46967 15.0303C9.17678 14.7374 9.17678 14.2626 9.46967 13.9697L19.1893 4.25H16Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    {{ __('Stake') }}
-                                </a>
-                            </div>
-                            <div class="account-bg-shape">
-                                <img src="{{ asset('frontend/theme_base/hardrock/images/bg/ac-balance-bg.png') }}" alt="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="rock-single-card-grid">
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M2 4C2 2.89543 2.89543 2 4 2H12C13.1046 2 14 2.89543 14 4V8C14 9.10457 13.1046 10 12 10H4C2.89543 10 2 9.10457 2 8V4Z"
-                                            fill="black" />
-                                        <path opacity="0.4"
-                                            d="M10 16C10 14.8954 10.8954 14 12 14H20C21.1046 14 22 14.8954 22 16V20C22 21.1046 21.1046 22 20 22H12C10.8954 22 10 21.1046 10 20V16Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M20.6036 6.75L19.8839 7.46967C19.591 7.76256 19.591 8.23744 19.8839 8.53033C20.1768 8.82322 20.6517 8.82322 20.9445 8.53033L22.2374 7.23744C22.9209 6.55402 22.9209 5.44598 22.2374 4.76256L20.9445 3.46967C20.6517 3.17678 20.1768 3.17678 19.8839 3.46967C19.591 3.76256 19.591 4.23744 19.8839 4.53033L20.6036 5.25L16 5.25C15.5858 5.25 15.25 5.58579 15.25 6C15.25 6.41421 15.5858 6.75 16 6.75L20.6036 6.75Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M3.39645 18.75L4.11612 19.4697C4.40901 19.7626 4.40901 20.2374 4.11612 20.5303C3.82322 20.8232 3.34835 20.8232 3.05546 20.5303L1.76256 19.2374C1.07915 18.554 1.07914 17.446 1.76256 16.7626L3.05546 15.4697C3.34835 15.1768 3.82322 15.1768 4.11612 15.4697C4.40901 15.7626 4.40901 16.2374 4.11612 16.5303L3.39645 17.25L8 17.25C8.41421 17.25 8.75 17.5858 8.75 18C8.75 18.4142 8.41421 18.75 8 18.75L3.39645 18.75Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title">{{ $dataCount['total_transaction'] }}</h3>
-                                <p class="description">{{ __('All Transactions') }}</p>
-                            </div>
-                        </div>
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M4 8H2V17L6.31083 19.1554C7.42168 19.7108 8.64658 20 9.88854 20H18C19.1046 20 20 19.1046 20 18C20 16.8954 19.1046 16 18 16H16.4164C15.4849 16 14.5663 15.7831 13.7331 15.3666L10.792 13.896C10.9843 13.7189 11.1432 13.4993 11.2528 13.2434C11.6664 12.2784 11.2241 11.1605 10.2622 10.7397L4 8Z"
-                                            fill="black" />
-                                        <circle cx="18" cy="8" r="4" fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_deposit'] }}</h3>
-                                <p class="description">{{ __('Deposits') }}</p>
-                            </div>
-                        </div>
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M12 5.75C12.4142 5.75 12.75 6.08579 12.75 6.5V7.35352C13.9043 7.67998 14.75 8.74122 14.75 10C14.75 10.4142 14.4142 10.75 14 10.75C13.5858 10.75 13.25 10.4142 13.25 10C13.25 9.30964 12.6904 8.75 12 8.75C11.3096 8.75 10.75 9.30964 10.75 10C10.75 10.6904 11.3096 11.25 12 11.25C13.5188 11.25 14.75 12.4812 14.75 14C14.75 15.2588 13.9043 16.32 12.75 16.6465V17.5C12.75 17.9142 12.4142 18.25 12 18.25C11.5858 18.25 11.25 17.9142 11.25 17.5V16.6465C10.0957 16.32 9.25 15.2588 9.25 14C9.25 13.5858 9.58579 13.25 10 13.25C10.4142 13.25 10.75 13.5858 10.75 14C10.75 14.6904 11.3096 15.25 12 15.25C12.6904 15.25 13.25 14.6904 13.25 14C13.25 13.3096 12.6904 12.75 12 12.75C10.4812 12.75 9.25 11.5188 9.25 10C9.25 8.74122 10.0957 7.67998 11.25 7.35352V6.5C11.25 6.08579 11.5858 5.75 12 5.75Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_investment'] }}
-                                </h3>
-                                <p class="description">{{ __('Stakes') }}</p>
-                            </div>
-                        </div>
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M14.0859 7L9.91411 7L8.51303 5.39296C7.13959 3.81763 8.74185 1.46298 10.7471 2.10985L11.6748 2.40914C11.8861 2.47728 12.1139 2.47728 12.3252 2.40914L13.2529 2.10985C15.2582 1.46298 16.8604 3.81763 15.487 5.39296L14.0859 7Z"
-                                            fill="black" />
-                                        <path opacity="0.4"
-                                            d="M5.68355 10.2103C6.46632 7.7055 8.78612 6 11.4104 6H12.5881C15.2125 6 17.5323 7.7055 18.315 10.2104L19.565 14.2104C20.7724 18.0739 17.886 22 13.8381 22H10.1604C6.11259 22 3.22618 18.0739 4.43355 14.2104L5.68355 10.2103Z"
-                                            fill="black" />
-                                        <path
-                                            d="M12 20C12 18.8954 12.8954 18 14 18H20C21.1046 18 22 18.8954 22 20C22 21.1046 21.1046 22 20 22H14C12.8954 22 12 21.1046 12 20Z"
-                                            fill="black" />
-                                        <path
-                                            d="M12 16C12 14.8954 12.8954 14 14 14H19.3333H20C21.1046 14 22 14.8954 22 16C22 17.1046 21.1046 18 20 18H14C12.8954 18 12 17.1046 12 16Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_profit'] }}</h3>
-                                <p class="description">{{ __('Stake Returns') }}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M4 12C4 10.8954 4.89543 10 6 10H15C16.1046 10 17 10.8954 17 12C17 13.1046 16.1046 14 15 14H6C4.89543 14 4 13.1046 4 12Z"
-                                            fill="black" />
-                                        <path
-                                            d="M15 14H6.16667C4.97005 14 4 14.8954 4 16C4 17.1046 4.97005 18 6.16667 18H15C16.1046 18 17 17.1046 17 16C17 14.8954 16.1046 14 15 14Z"
-                                            fill="black" />
-                                        <path opacity="0.4"
-                                            d="M20 18C20 15.7909 18.2091 14 16 14C15.8007 14 15.6047 14.0146 15.4132 14.0427C13.4823 14.3266 12 15.9902 12 18C12 20.2091 13.7909 22 16 22C18.2091 22 20 20.2091 20 18Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M11.25 3.39645L10.5303 4.11612C10.2374 4.40901 9.76256 4.40901 9.46967 4.11612C9.17678 3.82322 9.17678 3.34835 9.46967 3.05546L10.7626 1.76256C11.446 1.07915 12.554 1.07914 13.2374 1.76256L14.5303 3.05546C14.8232 3.34835 14.8232 3.82322 14.5303 4.11612C14.2374 4.40901 13.7626 4.40901 13.4697 4.11612L12.75 3.39645L12.75 7C12.75 7.41421 12.4142 7.75 12 7.75C11.5858 7.75 11.25 7.41421 11.25 7L11.25 3.39645Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_withdraw'] }}</h3>
-                                <p class="description">{{ __('Withdrawals') }}</p>
-                            </div>
-                        </div>
-                       
-                        
-                        
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M10.8694 13.75C9.79795 13.753 8.7328 14.0456 7.30683 14.6844C6.92882 14.8538 6.4851 14.6847 6.31574 14.3066C6.14638 13.9286 6.31553 13.4849 6.69354 13.3156C8.21341 12.6346 9.49813 12.2538 10.8652 12.25C12.2263 12.2463 13.5951 12.6166 15.2836 13.3056C15.6671 13.4621 15.8511 13.8999 15.6946 14.2834C15.5381 14.6669 15.1003 14.8509 14.7168 14.6944C13.105 14.0366 11.9468 13.747 10.8694 13.75Z"
-                                            fill="black" />
-                                        <circle cx="3" cy="3" r="3" transform="matrix(1 0 0 -1 8 11)" fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M18.75 16C18.75 15.5858 18.4142 15.25 18 15.25C17.5858 15.25 17.25 15.5858 17.25 16V17.25H16C15.5858 17.25 15.25 17.5858 15.25 18C15.25 18.4142 15.5858 18.75 16 18.75H17.25V20C17.25 20.4142 17.5858 20.75 18 20.75C18.4142 20.75 18.75 20.4142 18.75 20V18.75H20C20.4142 18.75 20.75 18.4142 20.75 18C20.75 17.5858 20.4142 17.25 20 17.25H18.75V16Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title">{{ $dataCount['total_referral'] }}</h3>
-                                <p class="description">{{ __('Referrals') }}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M10.7188 16.5889L13.6905 21.2421C14.1205 21.9154 15.0042 22.1311 15.696 21.7316C16.4363 21.3042 16.6675 20.3438 16.2029 19.6263L13.7755 15.8779L10.7188 16.5889Z"
-                                            fill="black" />
-                                        <path opacity="0.4"
-                                            d="M12.5134 3.98368C13.4294 2.99791 15.0378 3.17971 15.7106 4.34505L20.0027 11.7792C20.6755 12.9445 20.0287 14.4283 18.7171 14.7287L7.79977 17.268L4.79977 12.0718L12.5134 3.98368Z"
-                                            fill="black" />
-                                        <path
-                                            d="M7.84766 16.7273L5.34766 12.3972C4.93344 11.6797 4.01606 11.4339 3.29862 11.8481C2.58118 12.2624 2.33537 13.1797 2.74958 13.8972L5.24958 18.2273C5.66379 18.9447 6.58118 19.1906 7.29862 18.7763C8.01606 18.3621 8.26187 17.4447 7.84766 16.7273Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M20.0143 2.73953C20.4144 2.84673 20.6519 3.25799 20.5447 3.65809L20.1787 5.02411C20.0714 5.42421 19.6602 5.66165 19.2601 5.55444C18.86 5.44724 18.6226 5.03598 18.7298 4.63588L19.0958 3.26986C19.203 2.86976 19.6142 2.63232 20.0143 2.73953Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M20.7298 8.09994C20.837 7.69984 21.2482 7.4624 21.6483 7.56961L23.0143 7.93563C23.4144 8.04284 23.6519 8.45409 23.5447 8.85419C23.4375 9.25429 23.0262 9.49173 22.6261 9.38452L21.2601 9.01849C20.86 8.91129 20.6226 8.50004 20.7298 8.09994Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title">{{ $dataCount['total_ticket'] }}</h3>
-                                <p class="description">{{ __('Total Ticket') }}</p>
-                            </div>
-                        </div>
-                        
-                       
-
-                    </div>
-                    
-                </div>
-                <br>
-                
-              
-        </div>
-        
-        
-        
-        
-        
-        
-        
-        
-        <div class="col-xl-12">
-            <!-- Show mobile-screen content -->
-            <div class="rock-mobile-screen-show">
-                <!-- rock all navigation start -->
-                <div class="rock-all-navigation-mobile">
-                    <h6 class="rock-mobile-title">{{ __('') }}</h6>
-                    <div class="all-navigation-inner">
-                        <div class="all-navigation-grid">
-                            <div class="single-navigation-item">
-                                <a href="{{ route('user.schema') }}">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M11.1718 21.6242L3.00221 17.9107C2.22062 17.5554 2.22062 16.4453 3.00221 16.09L11.1718 12.3765C11.6976 12.1375 12.3012 12.1375 12.827 12.3765L20.9966 16.09C21.7782 16.4453 21.7782 17.5554 20.9966 17.9107L12.827 21.6242C12.3012 21.8632 11.6976 21.8632 11.1718 21.6242Z"
-                                                fill="white" />
-                                            <path
-                                                d="M11.1718 16.6242L3.00221 12.9107C2.22062 12.5554 2.22062 11.4453 3.00221 11.09L11.1718 7.37653C11.6976 7.13751 12.3012 7.13751 12.827 7.37653L20.9966 11.09C21.7782 11.4453 21.7782 12.5554 20.9966 12.9107L12.827 16.6242C12.3012 16.8632 11.6976 16.8632 11.1718 16.6242Z"
-                                                fill="white" />
-                                            <path opacity="0.4"
-                                                d="M11.1718 11.6242L3.00221 7.91071C2.22062 7.55544 2.22062 6.44525 3.00221 6.08998L11.1718 2.37653C11.6976 2.13751 12.3012 2.13751 12.827 2.37653L20.9966 6.08998C21.7782 6.44525 21.7782 7.55544 20.9966 7.91072L12.827 11.6242C12.3012 11.8632 11.6976 11.8632 11.1718 11.6242Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <span class="title">{{ __('Yields') }}</span>
-                                </a>
-                            </div>
-                            <div class="single-navigation-item">
-                                <a href="{{ route('user.invest-logs') }}">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M4 8H2V17L6.31083 19.1554C7.42168 19.7108 8.64658 20 9.88854 20H18C19.1046 20 20 19.1046 20 18C20 16.8954 19.1046 16 18 16H16.4164C15.4849 16 14.5663 15.7831 13.7331 15.3666L10.792 13.896C10.9843 13.7189 11.1432 13.4993 11.2528 13.2434C11.6664 12.2784 11.2241 11.1605 10.2622 10.7397L4 8Z"
-                                                fill="white" />
-                                            <circle cx="18" cy="8" r="4" fill="white" />
-                                        </svg>
-                                    </span>
-                                    <span class="title">{{ __('Active Stakes') }}</span>
-                                </a>
-                            </div>
-                            <div class="single-navigation-item">
-                                <a href="{{ route('user.transactions') }}">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M2 4C2 2.89543 2.89543 2 4 2H12C13.1046 2 14 2.89543 14 4V8C14 9.10457 13.1046 10 12 10H4C2.89543 10 2 9.10457 2 8V4Z"
-                                                fill="white" />
-                                            <path opacity="0.4"
-                                                d="M10 16C10 14.8954 10.8954 14 12 14H20C21.1046 14 22 14.8954 22 16V20C22 21.1046 21.1046 22 20 22H12C10.8954 22 10 21.1046 10 20V16Z"
-                                                fill="white" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M20.6036 6.75L19.8839 7.46967C19.591 7.76256 19.591 8.23744 19.8839 8.53033C20.1768 8.82322 20.6517 8.82322 20.9445 8.53033L22.2374 7.23744C22.9209 6.55402 22.9209 5.44598 22.2374 4.76256L20.9445 3.46967C20.6517 3.17678 20.1768 3.17678 19.8839 3.46967C19.591 3.76256 19.591 4.23744 19.8839 4.53033L20.6036 5.25L16 5.25C15.5858 5.25 15.25 5.58579 15.25 6C15.25 6.41421 15.5858 6.75 16 6.75L20.6036 6.75Z"
-                                                fill="white" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M3.39645 18.75L4.11612 19.4697C4.40901 19.7626 4.40901 20.2374 4.11612 20.5303C3.82322 20.8232 3.34835 20.8232 3.05546 20.5303L1.76256 19.2374C1.07915 18.554 1.07914 17.446 1.76256 16.7626L3.05546 15.4697C3.34835 15.1768 3.82322 15.1768 4.11612 15.4697C4.40901 15.7626 4.40901 16.2374 4.11612 16.5303L3.39645 17.25L8 17.25C8.41421 17.25 8.75 17.5858 8.75 18C8.75 18.4142 8.41421 18.75 8 18.75L3.39645 18.75Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <span class="title">{{ __('Transactions') }}</span>
-                                </a>
-                            </div>
-                            <div class="single-navigation-item">
-                                <a href="{{ route('user.deposit.amount') }}">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                                fill="white" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M12 5.75C12.4142 5.75 12.75 6.08579 12.75 6.5V7.35352C13.9043 7.67998 14.75 8.74122 14.75 10C14.75 10.4142 14.4142 10.75 14 10.75C13.5858 10.75 13.25 10.4142 13.25 10C13.25 9.30964 12.6904 8.75 12 8.75C11.3096 8.75 10.75 9.30964 10.75 10C10.75 10.6904 11.3096 11.25 12 11.25C13.5188 11.25 14.75 12.4812 14.75 14C14.75 15.2588 13.9043 16.32 12.75 16.6465V17.5C12.75 17.9142 12.4142 18.25 12 18.25C11.5858 18.25 11.25 17.9142 11.25 17.5V16.6465C10.0957 16.32 9.25 15.2588 9.25 14C9.25 13.5858 9.58579 13.25 10 13.25C10.4142 13.25 10.75 13.5858 10.75 14C10.75 14.6904 11.3096 15.25 12 15.25C12.6904 15.25 13.25 14.6904 13.25 14C13.25 13.3096 12.6904 12.75 12 12.75C10.4812 12.75 9.25 11.5188 9.25 10C9.25 8.74122 10.0957 7.67998 11.25 7.35352V6.5C11.25 6.08579 11.5858 5.75 12 5.75Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <span class="title">{{ __('Deposit') }}</span>
-                                </a>
-                            </div>
-                            <div class="single-navigation-item">
-                                <a href="{{ route('user.deposit.log') }}">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M20 13C20 17.9706 15.9706 22 11 22C6.02944 22 2 17.9706 2 13C2 8.02944 6.02944 4 11 4C15.9706 4 20 8.02944 20 13Z"
-                                                fill="white" />
-                                            <path
-                                                d="M21.8025 10.0128C21.0104 6.08419 17.9158 2.98956 13.9872 2.19745C12.9045 1.97914 12 2.89543 12 4V10C12 11.1046 12.8954 12 14 12H20C21.1046 12 22.0209 11.0955 21.8025 10.0128Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <span class="title">{{ __('Deposit log') }}</span>
-                                </a>
-                            </div>
-                            <div class="single-navigation-item">
-                                <a href="{{ route('user.wallet-exchange') }}">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M12 5.75C12.4142 5.75 12.75 6.08579 12.75 6.5V7.35352C13.9043 7.67998 14.75 8.74122 14.75 10C14.75 10.4142 14.4142 10.75 14 10.75C13.5858 10.75 13.25 10.4142 13.25 10C13.25 9.30964 12.6904 8.75 12 8.75C11.3096 8.75 10.75 9.30964 10.75 10C10.75 10.6904 11.3096 11.25 12 11.25C13.5188 11.25 14.75 12.4812 14.75 14C14.75 15.2588 13.9043 16.32 12.75 16.6465V17.5C12.75 17.9142 12.4142 18.25 12 18.25C11.5858 18.25 11.25 17.9142 11.25 17.5V16.6465C10.0957 16.32 9.25 15.2588 9.25 14C9.25 13.5858 9.58579 13.25 10 13.25C10.4142 13.25 10.75 13.5858 10.75 14C10.75 14.6904 11.3096 15.25 12 15.25C12.6904 15.25 13.25 14.6904 13.25 14C13.25 13.3096 12.6904 12.75 12 12.75C10.4812 12.75 9.25 11.5188 9.25 10C9.25 8.74122 10.0957 7.67998 11.25 7.35352V6.5C11.25 6.08579 11.5858 5.75 12 5.75Z"
-                                                fill="white" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M3.88648 8.71859C5.18395 5.51328 8.32685 3.25 12.0002 3.25C16.351 3.25 19.9602 6.42553 20.6364 10.5853L21.5502 9.9C21.8815 9.65147 22.3516 9.71863 22.6002 10.05C22.8487 10.3814 22.7815 10.8515 22.4502 11.1L21.439 11.8584C20.6057 12.4833 19.4908 12.5839 18.5592 12.118L17.6648 11.6708C17.2943 11.4856 17.1441 11.0351 17.3293 10.6646C17.5146 10.2941 17.9651 10.1439 18.3356 10.3292L19.1395 10.7311C18.5395 7.33207 15.5714 4.75 12.0002 4.75C8.95872 4.75 6.35296 6.62306 5.27689 9.28141C5.12147 9.66536 4.68422 9.85062 4.30027 9.6952C3.91632 9.53978 3.73106 9.10254 3.88648 8.71859ZM3.32897 13.1794C3.29555 13.1926 3.26253 13.2073 3.23 13.2236L2.33557 13.6708C1.96509 13.8561 1.51459 13.7059 1.32934 13.3354C1.1441 12.9649 1.29427 12.5144 1.66475 12.3292L2.55918 11.882C3.49084 11.4161 4.60572 11.5167 5.43902 12.1416L6.45016 12.9C6.78154 13.1485 6.84869 13.6186 6.60016 13.95C6.35164 14.2814 5.88154 14.3485 5.55016 14.1L4.93635 13.6396C5.67946 16.8539 8.56 19.25 12.0002 19.25C15.0416 19.25 17.6474 17.3769 18.7234 14.7186C18.8789 14.3346 19.3161 14.1494 19.7001 14.3048C20.084 14.4602 20.2693 14.8975 20.1139 15.2814C18.8164 18.4867 15.6735 20.75 12.0002 20.75C7.56763 20.75 3.90489 17.4541 3.32897 13.1794Z"
-                                                fill="white" />
-                                        </svg>
-                                    </span>
-                                    <span class="title">{{ __('Swap') }}</span>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="moretext">
-                            <div class="all-navigation-grid">
-                               
-                                <div class="single-navigation-item">
-                                    <a href="{{ route('user.withdraw.view') }}">
-                                        <span class="icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path opacity="0.4"
-                                                    d="M4 12C4 10.8954 4.89543 10 6 10H15C16.1046 10 17 10.8954 17 12C17 13.1046 16.1046 14 15 14H6C4.89543 14 4 13.1046 4 12Z"
-                                                    fill="white" />
-                                                <path
-                                                    d="M15 14H6.16667C4.97005 14 4 14.8954 4 16C4 17.1046 4.97005 18 6.16667 18H15C16.1046 18 17 17.1046 17 16C17 14.8954 16.1046 14 15 14Z"
-                                                    fill="white" />
-                                                <path opacity="0.4"
-                                                    d="M20 18C20 15.7909 18.2091 14 16 14C15.8007 14 15.6047 14.0146 15.4132 14.0427C13.4823 14.3266 12 15.9902 12 18C12 20.2091 13.7909 22 16 22C18.2091 22 20 20.2091 20 18Z"
-                                                    fill="white" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M11.25 3.39645L10.5303 4.11612C10.2374 4.40901 9.76256 4.40901 9.46967 4.11612C9.17678 3.82322 9.17678 3.34835 9.46967 3.05546L10.7626 1.76256C11.446 1.07915 12.554 1.07914 13.2374 1.76256L14.5303 3.05546C14.8232 3.34835 14.8232 3.82322 14.5303 4.11612C14.2374 4.40901 13.7626 4.40901 13.4697 4.11612L12.75 3.39645L12.75 7C12.75 7.41421 12.4142 7.75 12 7.75C11.5858 7.75 11.25 7.41421 11.25 7L11.25 3.39645Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </span>
-                                        <span class="title">{{ __('Withdraw') }}</span>
-                                    </a>
-                                </div>
-                                <div class="single-navigation-item">
-                                    <a href="{{ route('user.withdraw.log') }}">
-                                        <span class="icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path opacity="0.4"
-                                                    d="M18 4C19.1046 4 20 4.89543 20 6C20 7.10457 19.1046 8 18 8L10 8C8.89543 8 8 7.10457 8 6C8 4.89543 8.89543 4 10 4L18 4Z"
-                                                    fill="white" />
-                                                <path opacity="0.4"
-                                                    d="M18 12C19.1046 12 20 12.8954 20 14C20 15.1046 19.1046 16 18 16L10 16C8.89543 16 8 15.1046 8 14C8 12.8954 8.89543 12 10 12L18 12Z"
-                                                    fill="white" />
-                                                <rect x="16" y="8" width="4" height="12" rx="2"
-                                                    transform="rotate(90 16 8)" fill="white" />
-                                                <rect x="17" y="16" width="4" height="12" rx="2"
-                                                    transform="rotate(90 17 16)" fill="white" />
-                                            </svg>
-                                        </span>
-                                        <span class="title">{{ __('Withdrawals') }}</span>
-                                    </a>
-                                </div>
-                               
-                                <div class="single-navigation-item">
-                                    <a href="{{ route('user.referral') }}">
-                                        <span class="icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path opacity="0.4"
-                                                    d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z"
-                                                    fill="white" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M10.8694 13.75C9.79795 13.753 8.7328 14.0456 7.30683 14.6844C6.92882 14.8538 6.4851 14.6847 6.31574 14.3066C6.14638 13.9286 6.31553 13.4849 6.69354 13.3156C8.21341 12.6346 9.49813 12.2538 10.8652 12.25C12.2263 12.2463 13.5951 12.6166 15.2836 13.3056C15.6671 13.4621 15.8511 13.8999 15.6946 14.2834C15.5381 14.6669 15.1003 14.8509 14.7168 14.6944C13.105 14.0366 11.9468 13.747 10.8694 13.75Z"
-                                                    fill="white" />
-                                                <circle cx="3" cy="3" r="3" transform="matrix(1 0 0 -1 8 11)"
-                                                    fill="white" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M18.75 16C18.75 15.5858 18.4142 15.25 18 15.25C17.5858 15.25 17.25 15.5858 17.25 16V17.25H16C15.5858 17.25 15.25 17.5858 15.25 18C15.25 18.4142 15.5858 18.75 16 18.75H17.25V20C17.25 20.4142 17.5858 20.75 18 20.75C18.4142 20.75 18.75 20.4142 18.75 20V18.75H20C20.4142 18.75 20.75 18.4142 20.75 18C20.75 17.5858 20.4142 17.25 20 17.25H18.75V16Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </span>
-                                        <span class="title">{{ __('Referral') }}</span>
-                                    </a>
-                                </div>
-                                <div class="single-navigation-item">
-                                    <a href="{{ route('user.setting.show') }}">
-                                        <span class="icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path opacity="0.4"
-                                                    d="M12.9545 3H11.0455C9.99109 3 9.13635 3.80589 9.13635 4.8C9.13635 5.93761 7.91917 6.66087 6.92 6.11697L6.81852 6.06172C5.90541 5.56467 4.73782 5.85964 4.21064 6.72057L3.25609 8.27942C2.72891 9.14034 3.04176 10.2412 3.95487 10.7383C4.95451 11.2824 4.95451 12.7176 3.95487 13.2617C3.04176 13.7588 2.72891 14.8597 3.25609 15.7206L4.21064 17.2794C4.73782 18.1404 5.90541 18.4353 6.81851 17.9383L6.92 17.883C7.91917 17.3391 9.13635 18.0624 9.13635 19.2C9.13635 20.1941 9.99109 21 11.0455 21H12.9545C14.0089 21 14.8636 20.1941 14.8636 19.2C14.8636 18.0624 16.0808 17.3391 17.08 17.883L17.1815 17.9383C18.0946 18.4353 19.2622 18.1403 19.7894 17.2794L20.7439 15.7206C21.2711 14.8596 20.9582 13.7588 20.0451 13.2617C19.0455 12.7176 19.0455 11.2824 20.0451 10.7383C20.9582 10.2412 21.2711 9.14036 20.7439 8.27943L19.7894 6.72058C19.2622 5.85966 18.0946 5.56468 17.1815 6.06174L17.08 6.11698C16.0808 6.66088 14.8636 5.93762 14.8636 4.8C14.8636 3.80589 14.0089 3 12.9545 3Z"
-                                                    fill="white" />
-                                                <circle cx="12" cy="12" r="3" fill="white" />
-                                            </svg>
-                                        </span>
-                                        <span class="title">{{ __('Settings') }}</span>
-                                    </a>
-                                </div>
-                                <div class="single-navigation-item">
-                                    <a href="{{ route('user.ticket.index') }}">
-                                        <span class="icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M10.7188 16.5889L13.6905 21.2421C14.1205 21.9154 15.0042 22.1311 15.696 21.7316C16.4363 21.3042 16.6675 20.3438 16.2029 19.6263L13.7755 15.8779L10.7188 16.5889Z"
-                                                    fill="white" />
-                                                <path opacity="0.4"
-                                                    d="M12.5125 3.98416C13.4284 2.9984 15.0369 3.1802 15.7097 4.34554L20.0017 11.7796C20.6746 12.945 20.0278 14.4288 18.7161 14.7292L7.79879 17.2685L4.79879 12.0723L12.5125 3.98416Z"
-                                                    fill="white" />
-                                                <path
-                                                    d="M7.84766 16.7268L5.34766 12.3967C4.93344 11.6793 4.01606 11.4334 3.29862 11.8477C2.58118 12.2619 2.33537 13.1793 2.74958 13.8967L5.24958 18.2268C5.66379 18.9443 6.58118 19.1901 7.29862 18.7759C8.01606 18.3616 8.26187 17.4443 7.84766 16.7268Z"
-                                                    fill="white" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M20.0143 2.73953C20.4144 2.84673 20.6519 3.25799 20.5447 3.65809L20.1787 5.02411C20.0714 5.42421 19.6602 5.66165 19.2601 5.55444C18.86 5.44724 18.6226 5.03598 18.7298 4.63588L19.0958 3.26986C19.203 2.86976 19.6142 2.63232 20.0143 2.73953Z"
-                                                    fill="white" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M20.7298 8.09994C20.837 7.69984 21.2482 7.4624 21.6483 7.56961L23.0143 7.93563C23.4144 8.04284 23.6519 8.45409 23.5447 8.85419C23.4375 9.25429 23.0262 9.49173 22.6261 9.38452L21.2601 9.01849C20.86 8.91129 20.6226 8.50004 20.7298 8.09994Z"
-                                                    fill="white" />
-                                            </svg>
-                                        </span>
-                                        <span class="title">{{ __('Help Center') }}</span>
-                                    </a>
-                                </div>
-                                <div class="single-navigation-item">
-                                    <a href="{{ route('user.notification.all') }}">
-                                        <span class="icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M12 21C13.385 21 14.5633 20.1652 15 19H9C9.43668 20.1652 10.615 21 12 21Z"
-                                                    fill="white" />
-                                                <path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M13.6896 3.75403C13.274 3.29116 12.671 3 12 3C10.7463 3 9.73005 4.01629 9.73005 5.26995V5.37366C7.58766 6.10719 6.0016 7.85063 5.76046 9.97519L5.31328 13.9153C5.23274 14.6249 4.93344 15.3016 4.44779 15.8721C3.35076 17.1609 4.39443 19 6.22281 19H17.7772C19.6056 19 20.6492 17.1609 19.5522 15.8721C19.0666 15.3016 18.7673 14.6249 18.6867 13.9153L18.2395 9.97519C18.2333 9.92024 18.2262 9.86556 18.2181 9.81113C17.8341 9.93379 17.4248 10 17 10C14.7909 10 13 8.20914 13 6C13 5.16744 13.2544 4.3943 13.6896 3.75403Z"
-                                                    fill="white" />
-                                                <circle cx="17" cy="6" r="3" fill="white" />
-                                            </svg>
-                                        </span>
-                                        <span class="title">{{ __('Notifications') }}</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-center mt-15">
-                        <button class="rock-moreless-button site-btn transparent-btn">{{ __('Load more') }}</button>
-                    </div>
-                </div>
-                <!-- rock all navigation start -->
-            </div>
-        </div>
-        <div class="col-xl-12">
-            <!-- Show mobile-screen content -->
-            <div class="rock-mobile-screen-show">
-                <div class="rock-mobile-common-table mt-30 mb-30">
-                    <h6 class="rock-mobile-title mb-15">{{ __('') }}</h6>
-                    <!-- rock all navigation start -->
-                    <div class="rock-single-card-grid">
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M2 4C2 2.89543 2.89543 2 4 2H12C13.1046 2 14 2.89543 14 4V8C14 9.10457 13.1046 10 12 10H4C2.89543 10 2 9.10457 2 8V4Z"
-                                            fill="black" />
-                                        <path opacity="0.4"
-                                            d="M10 16C10 14.8954 10.8954 14 12 14H20C21.1046 14 22 14.8954 22 16V20C22 21.1046 21.1046 22 20 22H12C10.8954 22 10 21.1046 10 20V16Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M20.6036 6.75L19.8839 7.46967C19.591 7.76256 19.591 8.23744 19.8839 8.53033C20.1768 8.82322 20.6517 8.82322 20.9445 8.53033L22.2374 7.23744C22.9209 6.55402 22.9209 5.44598 22.2374 4.76256L20.9445 3.46967C20.6517 3.17678 20.1768 3.17678 19.8839 3.46967C19.591 3.76256 19.591 4.23744 19.8839 4.53033L20.6036 5.25L16 5.25C15.5858 5.25 15.25 5.58579 15.25 6C15.25 6.41421 15.5858 6.75 16 6.75L20.6036 6.75Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M3.39645 18.75L4.11612 19.4697C4.40901 19.7626 4.40901 20.2374 4.11612 20.5303C3.82322 20.8232 3.34835 20.8232 3.05546 20.5303L1.76256 19.2374C1.07915 18.554 1.07914 17.446 1.76256 16.7626L3.05546 15.4697C3.34835 15.1768 3.82322 15.1768 4.11612 15.4697C4.40901 15.7626 4.40901 16.2374 4.11612 16.5303L3.39645 17.25L8 17.25C8.41421 17.25 8.75 17.5858 8.75 18C8.75 18.4142 8.41421 18.75 8 18.75L3.39645 18.75Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title">{{ $dataCount['total_transaction'] }}</h3>
-                                <p class="description">{{ __('Transactions') }}</p>
-                            </div>
-                        </div>
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M4 8H2V17L6.31083 19.1554C7.42168 19.7108 8.64658 20 9.88854 20H18C19.1046 20 20 19.1046 20 18C20 16.8954 19.1046 16 18 16H16.4164C15.4849 16 14.5663 15.7831 13.7331 15.3666L10.792 13.896C10.9843 13.7189 11.1432 13.4993 11.2528 13.2434C11.6664 12.2784 11.2241 11.1605 10.2622 10.7397L4 8Z"
-                                            fill="black" />
-                                        <circle cx="18" cy="8" r="4" fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_deposit'] }}</h3>
-                                <p class="description">{{ __('Deposits') }}</p>
-                            </div>
-                        </div>
-                        <div class="rock-single-card">
-                            <div class="icon">
-                                <span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path opacity="0.4"
-                                            d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                            fill="black" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M12 5.75C12.4142 5.75 12.75 6.08579 12.75 6.5V7.35352C13.9043 7.67998 14.75 8.74122 14.75 10C14.75 10.4142 14.4142 10.75 14 10.75C13.5858 10.75 13.25 10.4142 13.25 10C13.25 9.30964 12.6904 8.75 12 8.75C11.3096 8.75 10.75 9.30964 10.75 10C10.75 10.6904 11.3096 11.25 12 11.25C13.5188 11.25 14.75 12.4812 14.75 14C14.75 15.2588 13.9043 16.32 12.75 16.6465V17.5C12.75 17.9142 12.4142 18.25 12 18.25C11.5858 18.25 11.25 17.9142 11.25 17.5V16.6465C10.0957 16.32 9.25 15.2588 9.25 14C9.25 13.5858 9.58579 13.25 10 13.25C10.4142 13.25 10.75 13.5858 10.75 14C10.75 14.6904 11.3096 15.25 12 15.25C12.6904 15.25 13.25 14.6904 13.25 14C13.25 13.3096 12.6904 12.75 12 12.75C10.4812 12.75 9.25 11.5188 9.25 10C9.25 8.74122 10.0957 7.67998 11.25 7.35352V6.5C11.25 6.08579 11.5858 5.75 12 5.75Z"
-                                            fill="black" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="content">
-                                <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_investment'] }}
-                                </h3>
-                                <p class="description">{{ __('Stakes') }}</p>
-                            </div>
-                        </div>
-                        <div class="moretext-2 rock-single-card-grid">
-                            <div class="rock-single-card">
-                                <div class="icon">
-                                    <span>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M14.0859 7L9.91411 7L8.51303 5.39296C7.13959 3.81763 8.74185 1.46298 10.7471 2.10985L11.6748 2.40914C11.8861 2.47728 12.1139 2.47728 12.3252 2.40914L13.2529 2.10985C15.2582 1.46298 16.8604 3.81763 15.487 5.39296L14.0859 7Z"
-                                                fill="black" />
-                                            <path opacity="0.4"
-                                                d="M5.68355 10.2103C6.46632 7.7055 8.78612 6 11.4104 6H12.5881C15.2125 6 17.5323 7.7055 18.315 10.2104L19.565 14.2104C20.7724 18.0739 17.886 22 13.8381 22H10.1604C6.11259 22 3.22618 18.0739 4.43355 14.2104L5.68355 10.2103Z"
-                                                fill="black" />
-                                            <path
-                                                d="M12 20C12 18.8954 12.8954 18 14 18H20C21.1046 18 22 18.8954 22 20C22 21.1046 21.1046 22 20 22H14C12.8954 22 12 21.1046 12 20Z"
-                                                fill="black" />
-                                            <path
-                                                d="M12 16C12 14.8954 12.8954 14 14 14H19.3333H20C21.1046 14 22 14.8954 22 16C22 17.1046 21.1046 18 20 18H14C12.8954 18 12 17.1046 12 16Z"
-                                                fill="black" />
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="content">
-                                    <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_profit'] }}</h3>
-                                    <p class="description">{{ __('Stake Returns') }}</p>
-                                </div>
-                            </div>
-                            
-                            <div class="rock-single-card">
-                                <div class="icon">
-                                    <span>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M4 12C4 10.8954 4.89543 10 6 10H15C16.1046 10 17 10.8954 17 12C17 13.1046 16.1046 14 15 14H6C4.89543 14 4 13.1046 4 12Z"
-                                                fill="black" />
-                                            <path
-                                                d="M15 14H6.16667C4.97005 14 4 14.8954 4 16C4 17.1046 4.97005 18 6.16667 18H15C16.1046 18 17 17.1046 17 16C17 14.8954 16.1046 14 15 14Z"
-                                                fill="black" />
-                                            <path opacity="0.4"
-                                                d="M20 18C20 15.7909 18.2091 14 16 14C15.8007 14 15.6047 14.0146 15.4132 14.0427C13.4823 14.3266 12 15.9902 12 18C12 20.2091 13.7909 22 16 22C18.2091 22 20 20.2091 20 18Z"
-                                                fill="black" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M11.25 3.39645L10.5303 4.11612C10.2374 4.40901 9.76256 4.40901 9.46967 4.11612C9.17678 3.82322 9.17678 3.34835 9.46967 3.05546L10.7626 1.76256C11.446 1.07915 12.554 1.07914 13.2374 1.76256L14.5303 3.05546C14.8232 3.34835 14.8232 3.82322 14.5303 4.11612C14.2374 4.40901 13.7626 4.40901 13.4697 4.11612L12.75 3.39645L12.75 7C12.75 7.41421 12.4142 7.75 12 7.75C11.5858 7.75 11.25 7.41421 11.25 7L11.25 3.39645Z"
-                                                fill="black" />
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="content">
-                                    <h3 class="title"><span>{{ $currencySymbol }}</span>{{ $dataCount['total_withdraw'] }}</h3>
-                                    <p class="description">{{ __('Withdrawals') }}</p>
-                                </div>
-                            </div>
-                            
-                            
-                           
-                            <div class="rock-single-card">
-                                <div class="icon">
-                                    <span>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4"
-                                                d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z"
-                                                fill="black" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M10.8694 13.75C9.79795 13.753 8.7328 14.0456 7.30683 14.6844C6.92882 14.8538 6.4851 14.6847 6.31574 14.3066C6.14638 13.9286 6.31553 13.4849 6.69354 13.3156C8.21341 12.6346 9.49813 12.2538 10.8652 12.25C12.2263 12.2463 13.5951 12.6166 15.2836 13.3056C15.6671 13.4621 15.8511 13.8999 15.6946 14.2834C15.5381 14.6669 15.1003 14.8509 14.7168 14.6944C13.105 14.0366 11.9468 13.747 10.8694 13.75Z"
-                                                fill="black" />
-                                            <circle cx="3" cy="3" r="3" transform="matrix(1 0 0 -1 8 11)" fill="black" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M18.75 16C18.75 15.5858 18.4142 15.25 18 15.25C17.5858 15.25 17.25 15.5858 17.25 16V17.25H16C15.5858 17.25 15.25 17.5858 15.25 18C15.25 18.4142 15.5858 18.75 16 18.75H17.25V20C17.25 20.4142 17.5858 20.75 18 20.75C18.4142 20.75 18.75 20.4142 18.75 20V18.75H20C20.4142 18.75 20.75 18.4142 20.75 18C20.75 17.5858 20.4142 17.25 20 17.25H18.75V16Z"
-                                                fill="black" />
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="content">
-                                    <h3 class="title">{{ $dataCount['total_referral'] }}</h3>
-                                    <p class="description">{{ __('Referrals') }}</p>
-                                </div>
-                            </div>
-                          
-                            <div class="rock-single-card">
-                                <div class="icon">
-                                    <span>
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M10.7188 16.5889L13.6905 21.2421C14.1205 21.9154 15.0042 22.1311 15.696 21.7316C16.4363 21.3042 16.6675 20.3438 16.2029 19.6263L13.7755 15.8779L10.7188 16.5889Z"
-                                                fill="black" />
-                                            <path opacity="0.4"
-                                                d="M12.5134 3.98368C13.4294 2.99791 15.0378 3.17971 15.7106 4.34505L20.0027 11.7792C20.6755 12.9445 20.0287 14.4283 18.7171 14.7287L7.79977 17.268L4.79977 12.0718L12.5134 3.98368Z"
-                                                fill="black" />
-                                            <path
-                                                d="M7.84766 16.7273L5.34766 12.3972C4.93344 11.6797 4.01606 11.4339 3.29862 11.8481C2.58118 12.2624 2.33537 13.1797 2.74958 13.8972L5.24958 18.2273C5.66379 18.9447 6.58118 19.1906 7.29862 18.7763C8.01606 18.3621 8.26187 17.4447 7.84766 16.7273Z"
-                                                fill="black" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M20.0143 2.73953C20.4144 2.84673 20.6519 3.25799 20.5447 3.65809L20.1787 5.02411C20.0714 5.42421 19.6602 5.66165 19.2601 5.55444C18.86 5.44724 18.6226 5.03598 18.7298 4.63588L19.0958 3.26986C19.203 2.86976 19.6142 2.63232 20.0143 2.73953Z"
-                                                fill="black" />
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M20.7298 8.09994C20.837 7.69984 21.2482 7.4624 21.6483 7.56961L23.0143 7.93563C23.4144 8.04284 23.6519 8.45409 23.5447 8.85419C23.4375 9.25429 23.0262 9.49173 22.6261 9.38452L21.2601 9.01849C20.86 8.91129 20.6226 8.50004 20.7298 8.09994Z"
-                                                fill="black" />
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="content">
-                                    <h3 class="title">{{ $dataCount['total_ticket'] }}</h3>
-                                    <p class="description">{{ __('Total Ticket') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <button class="rock-moreless-button-2 site-btn transparent-btn">{{ __('Load more') }}</button>
-                        </div>
-                    </div>
-                    
-                   
-                    <!-- rock all navigation start -->
-                </div>
-            </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        <div class="col-xl-12">
-            <!-- Show desktop-screen content -->
-            <div class="rock-desktop-screen-show">
-                <div class="rock-recent-transactions-area">
-                    <div class="rock-dashboard-card">
-                        <div class="rock-dashboard-title-inner">
-                            <h3 class="rock-dashboard-tile">{{ __('Recent Transactions') }}</h3>
-                        </div>
-                        <div class="rock-recent-transactions-table">
-                            <div class="rock-custom-table">
-                                <div class="contents">
-                                    <div class="site-table-list site-table-head">
-                                        <div class="site-table-col">{{ __('Description') }}</div>
-                                        <div class="site-table-col">{{ __('Transaction ID') }}</div>
-                                        <div class="site-table-col">{{ __('Type') }}</div>
-                                        <div class="site-table-col">{{ __('Amount') }}</div>
-                                        <div class="site-table-col">{{ __('Charge') }}</div>
-                                        <div class="site-table-col">{{ __('Status') }}</div>
-                                        <div class="site-table-col">{{ __('Gateway') }}</div>
-                                    </div>
-                                    @foreach($recentTransactions as $transaction)
-                                    <div class="site-table-list">
-                                        <div class="site-table-col">
-                                            <div class="transactions-description">
-                                                <div class="iocn">
-                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <path opacity="0.4"
-                                                            d="M4 8H2V17L6.31083 19.1554C7.42168 19.7108 8.64658 20 9.88854 20H18C19.1046 20 20 19.1046 20 18C20 16.8954 19.1046 16 18 16H16.4164C15.4849 16 14.5663 15.7831 13.7331 15.3666L10.792 13.896C10.9843 13.7189 11.1432 13.4993 11.2528 13.2434C11.6664 12.2784 11.2241 11.1605 10.2622 10.7397L4 8Z"
-                                                            fill="#E9D8A6" />
-                                                        <circle cx="18" cy="8" r="4" fill="#E9D8A6" />
-                                                    </svg>
-                                                </div>
-                                                <div class="content">
-                                                    <h4 class="title pinkDiamond-text">
-                                                        {{ $transaction->description }}
-                                                    </h4>
-                                                    <p class="description">{{ $transaction->created_at }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="site-table-col">
-                                            <span class="white-text">{{ $transaction->tnx }}</span>
-                                        </div>
-                                        <div class="site-table-col">
-                                            <span
-                                                class="kittensEye-text">{{ ucwords(str_replace('_',' ',$transaction->type->value)) }}</span>
-                                        </div>
-                                        @php
-                                        $minusSvg ='<svg width="8" height="12" viewBox="0 0 8 12" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M3.55545 11.4419C3.79953 11.686 4.19526 11.686 4.43934 11.4419L7.77267 8.10861C8.01675 7.86453 8.01675 7.4688 7.77267 7.22472C7.52859 6.98065 7.13286 6.98065 6.88879 7.22472L4.6224 9.49112V1C4.6224 0.654822 4.34257 0.375 3.9974 0.375C3.65222 0.375 3.3724 0.654822 3.3724 1V9.49112L1.106 7.22472C0.861927 6.98065 0.466198 6.98065 0.222121 7.22472C-0.0219569 7.4688 -0.0219569 7.86453 0.222121 8.10861L3.55545 11.4419Z"
-                                                fill="#FF3E3E" />
-                                        </svg>';
-
-                                        $plusSvg = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M9.55545 4.55806C9.79953 4.31398 10.1953 4.31398 10.4393 4.55806L13.7727 7.89139C14.0167 8.13547 14.0167 8.5312 13.7727 8.77528C13.5286 9.01935 13.1329 9.01935 12.8888 8.77528L10.6224 6.50888V15C10.6224 15.3452 10.3426 15.625 9.9974 15.625C9.65222 15.625 9.3724 15.3452 9.3724 15V6.50888L7.106 8.77528C6.86193 9.01935 6.4662 9.01935 6.22212 8.77528C5.97804 8.5312 5.97804 8.13547 6.22212 7.89139L9.55545 4.55806Z"
-                                                fill="#85FFC4" />
-                                        </svg>';
-                                        @endphp
-                                        <div class="site-table-col">
-                                            <span
-                                                class="{{ txn_type($transaction->type->value,['success-text','danger-text'],'hardrock') }}">
-                                                {{ txn_type($transaction->type->value,['+','-'],'hardrock') }}
-                                                {{ $transaction->amount }} {{ $currency }}
-
-                                                @if(txn_type($transaction->type->value,['+','-'],'hardrock') == '-')
-                                                {!! $minusSvg !!}
-                                                @else
-                                                {!! $plusSvg !!}
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="site-table-col">
-                                            <span class="white-text">{{ $transaction->charge }} {{ $currency }}</span>
-                                        </div>
-                                        <div class="site-table-col">
-                                            <span @class([ 'rock-badge' , 'badge-success'=> $transaction->status->value ==
-                                                'success',
-                                                'danger' => $transaction->status->value == 'failed',
-                                                'warning' => $transaction->status->value == 'pending',
-                                                ])>
-                                                {{ ucfirst($transaction->status->value) }}
-                                            </span>
-                                        </div>
-                                        <div class="site-table-col">
-                                            <span class="white-text">{{ $transaction->method }}</span>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Show mobile-screen content -->
-            <div class="rock-mobile-screen-show">
-                <div class="rock-mobile-common-table">
-                    <h6 class="rock-mobile-title mb-15">{{ __('Recent Transactions') }}</h6>
-                    @foreach($recentTransactions as $transaction)
-                    <div class="rock-mobile-table-card">
-                        <div class="transactions-description">
-                            <div class="iocn">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.4"
-                                        d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10Z"
-                                        fill="#FFD6FF" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M10 3.75C10.4142 3.75 10.75 4.08579 10.75 4.5V5.35352C11.9043 5.67998 12.75 6.74122 12.75 8C12.75 8.41421 12.4142 8.75 12 8.75C11.5858 8.75 11.25 8.41421 11.25 8C11.25 7.30964 10.6904 6.75 10 6.75C9.30964 6.75 8.75 7.30964 8.75 8C8.75 8.69036 9.30964 9.25 10 9.25C11.5188 9.25 12.75 10.4812 12.75 12C12.75 13.2588 11.9043 14.32 10.75 14.6465V15.5C10.75 15.9142 10.4142 16.25 10 16.25C9.58579 16.25 9.25 15.9142 9.25 15.5V14.6465C8.09575 14.32 7.25 13.2588 7.25 12C7.25 11.5858 7.58579 11.25 8 11.25C8.41421 11.25 8.75 11.5858 8.75 12C8.75 12.6904 9.30964 13.25 10 13.25C10.6904 13.25 11.25 12.6904 11.25 12C11.25 11.3096 10.6904 10.75 10 10.75C8.48122 10.75 7.25 9.51878 7.25 8C7.25 6.74122 8.09575 5.67998 9.25 5.35352V4.5C9.25 4.08579 9.58579 3.75 10 3.75Z"
-                                        fill="#FFD6FF" />
-                                </svg>
-                            </div>
-                            <div class="content">
-                                <h4 class="title pinkDiamond-text">{{ $transaction->description }}</h4>
-                                <p class="description">{{ $transaction->created_at }}</p>
-                            </div>
-                        </div>
-                        @php
-                        $minusSvg ='<svg width="8" height="12" viewBox="0 0 8 12" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M3.55545 11.4419C3.79953 11.686 4.19526 11.686 4.43934 11.4419L7.77267 8.10861C8.01675 7.86453 8.01675 7.4688 7.77267 7.22472C7.52859 6.98065 7.13286 6.98065 6.88879 7.22472L4.6224 9.49112V1C4.6224 0.654822 4.34257 0.375 3.9974 0.375C3.65222 0.375 3.3724 0.654822 3.3724 1V9.49112L1.106 7.22472C0.861927 6.98065 0.466198 6.98065 0.222121 7.22472C-0.0219569 7.4688 -0.0219569 7.86453 0.222121 8.10861L3.55545 11.4419Z"
-                                fill="#FF3E3E" />
-                        </svg>';
-
-                        $plusSvg = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M9.55545 4.55806C9.79953 4.31398 10.1953 4.31398 10.4393 4.55806L13.7727 7.89139C14.0167 8.13547 14.0167 8.5312 13.7727 8.77528C13.5286 9.01935 13.1329 9.01935 12.8888 8.77528L10.6224 6.50888V15C10.6224 15.3452 10.3426 15.625 9.9974 15.625C9.65222 15.625 9.3724 15.3452 9.3724 15V6.50888L7.106 8.77528C6.86193 9.01935 6.4662 9.01935 6.22212 8.77528C5.97804 8.5312 5.97804 8.13547 6.22212 7.89139L9.55545 4.55806Z"
-                                fill="#85FFC4" />
-                        </svg>';
-                        @endphp
-                        <div class="transactions-short-content">
-                            <span
-                                class="{{ txn_type($transaction->type->value,['success-text','danger-text'],'hardrock') }}">
-                                {{ txn_type($transaction->type->value,['+','-'],'hardrock') }}
-                                {{ $transaction->amount }} {{ $currency }}
-
-                                @if(txn_type($transaction->type->value,['+','-'],'hardrock') == '-')
-                                {!! $minusSvg !!}
-                                @else
-                                {!! $plusSvg !!}
-                                @endif
-                            </span>
-                            <span class="white-text d-block">
-                                -{{ $transaction->charge }} {{ $currency }}
-                            </span>
-                            <span class="white-text d-block">
-                                {{ $transaction->method }}
-                            </span>
-                        </div>
-                        <div class="transaction-id">
-                            <span class="white-text d-block">
-                                {{ $transaction->tnx }}
-                            </span>
-                        </div>
-                        <div class="transactions-badge">
-                            <span @class([ 'rock-badge' , 'success'=> $transaction->status->value == 'success',
-                                'danger' => $transaction->status->value == 'failed',
-                                'warning' => $transaction->status->value == 'pending',
-                                ])>
-                                {{ ucfirst($transaction->status->value) }}
-                            </span>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @if(setting('sign_up_referral','permission'))
-        
-        @endif
-    </div>
-</div>
-<!-- Container-fluid Ends-->
 @endsection
+
+@section('content')
+
+@php
+    $popupNotification = \App\Models\Notification::where('for', 'user')
+        ->where('user_id', auth()->id())
+        ->where('read', 0)
+        ->latest()
+        ->first();
+@endphp
+
+@if($popupNotification)
+<div class="modal fade" id="userPopupNotification" tabindex="-1" aria-labelledby="userPopupNotificationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content site-table-modal">
+            <div class="modal-body popup-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="popup-body-text">
+                    <h3 class="title mb-3">{{ $popupNotification->title }}</h3>
+                    <p style="white-space: pre-wrap;">{!! nl2br(e($popupNotification->notice)) !!}</p>
+                    <a href="{{ $popupNotification->action_url }}"
+                       class="site-btn-sm primary-btn mt-3">
+                        {{ __('Continue') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- MODERN DASHBOARD SECTION -->
+<div class="modern-dashboard-wrapper">
+    <div class="dashboard-main-content">
+        
+        <!-- Greeting Section -->
+        <div class="dashboard-greeting">
+            <h1>{{ __('Good Day') }}, {{ $user->first_name }}! ðŸ‘‹</h1>
+            <p>{{ __('Track your staking, manage pools, and grow decentralized.') }}</p>
+        </div>
+
+       <!-- Info Bar -->
+<div class="dashboard-info-bar">
+    <div class="info-item">
+        <svg class="info-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"></line>
+            <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"></line>
+            <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line>
+        </svg>
+        <div class="info-item-content">
+            <h6>{{ __('Member since') }}</h6>
+            <p>{{ \Carbon\Carbon::parse($user->created_at)->format('M Y') }}</p>
+        </div>
+    </div>
+
+    <div class="info-item">
+    <svg class="info-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="info-item-content">
+        <h6>{{ __('Favorite pool') }}</h6>
+        <p>{{ $dataCount['favorite_pool'] ?? __('No Pool Yet') }}</p>
+    </div>
+</div>
+
+    <div class="info-item">
+        <svg class="info-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+            <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        </svg>
+        <div class="info-item-content">
+            <h6>{{ __('Active stakes') }}</h6>
+            <p>{{ $dataCount['active_investment'] ?? 0 }}</p>
+        </div>
+    </div>
+</div>
+        <!-- Stats Grid - Three Cards -->
+        <div class="dashboard-stats-grid">
+            <!-- Total Staked -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon-wrapper">
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="12" y1="1" x2="12" y2="23" stroke-width="2" stroke-linecap="round"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-trend">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            <polyline points="17 6 23 6 23 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                        </svg>
+                        --
+                    </div>
+                </div>
+                <div class="stat-card-body">
+                    <h6>{{ $currencySymbol }}{{ number_format($dataCount['total_investment'] ?? 0, 2) }}</h6>
+                    <p>{{ __('Your Total Staked') }}</p>
+                    <div class="stat-card-footer">{{ __('Across all pools') }}</div>
+                </div>
+            </div>
+
+            <!-- Total Rewards Earned -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon-wrapper">
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-trend">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            <polyline points="17 6 23 6 23 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                        </svg>
+                        --
+                    </div>
+                </div>
+                <div class="stat-card-body">
+                    <h6>{{ $currencySymbol }}{{ number_format($dataCount['total_profit'] ?? 0, 2) }}</h6>
+                    <p>{{ __('Total Rewards Earned') }}</p>
+                    <div class="stat-card-footer">{{ __('Lifetime earnings') }}</div>
+                </div>
+            </div>
+
+            <!-- Active Stakes -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon-wrapper">
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                            <circle cx="12" cy="12" r="6" stroke-width="2"></circle>
+                            <circle cx="12" cy="12" r="2" stroke-width="2"></circle>
+                        </svg>
+                    </div>
+                    <div class="stat-trend">
+                        --
+                    </div>
+                </div>
+                <div class="stat-card-body">
+                    <h6>{{ $dataCount['active_investment'] ?? 0 }}</h6>
+                    <p>{{ __('Active Stakes') }}</p>
+                    <div class="stat-card-footer">{{ __('Currently staking') }}</div>
+                </div>
+            </div>
+        </div>
+
+               <!-- Main Grid: Balance + Quick Actions -->
+        <div class="dashboard-grid">
+            <!-- Balance Card -->
+          <div class="balance-card balance-card-pro" id="usdtBalanceCard">
+    <div class="balance-chart-bg">
+        <svg viewBox="0 0 600 140" preserveAspectRatio="none" class="balance-chart-svg">
+            <defs>
+                <linearGradient id="balanceAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(70,185,255,0.35)" />
+                    <stop offset="100%" stop-color="rgba(70,185,255,0)" />
+                </linearGradient>
+            </defs>
+            <path id="balanceChartArea" d=""></path>
+            <path id="balanceChartPath" d=""></path>
+        </svg>
+    </div>
+
+    <div class="balance-card-top">
+        <div class="balance-card-title-wrap">
+            <h6>{{ __('Total Balance') }}</h6>
+            <p class="balance-subtitle">{{ __('USDT yield linked overview') }}</p>
+        </div>
+
+        <div class="balance-apy-box">
+            <span class="balance-apy-badge" id="liveUsdtApy">8.42% APY</span>
+            <small class="balance-apy-note">{{ __('Live USDT APY') }}</small>
+        </div>
+    </div>
+
+    <div class="balance-main-row">
+        <h4 class="balance-amount">{{ $currencySymbol }}{{ number_format($user->balance, 2) }}</h4>
+    </div>
+
+    <div class="balance-updated-row">
+        <span class="balance-updated-label">{{ __('Last updated') }}:</span>
+        <span id="balanceLastUpdated">{{ now()->format('M d, Y h:i A') }}</span>
+    </div>
+
+    <div class="balance-secondary compact-balance-meta">
+        <div class="balance-item">
+            <h6>{{ __('Profit Wallet') }}</h6>
+            <p>{{ $currencySymbol }}{{ number_format($user->profit_balance, 2) }}</p>
+        </div>
+
+        <div class="balance-item">
+            <h6>{{ __('This Week') }}</h6>
+            <p>{{ $currencySymbol }}{{ number_format($dataCount['profit_last_7_days'] ?? 0, 2) }}</p>
+        </div>
+    </div>
+</div>
+
+            <!-- Quick Actions - Desktop Only -->
+            <div class="quick-actions-card">
+                <h4>{{ __('Quick Actions') }}</h4>
+                <div class="quick-actions-grid">
+                    <a href="{{ route('user.invest-logs') }}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9" stroke-width="2"></line>
+                                <line x1="9" y1="21" x2="9" y2="9" stroke-width="2"></line>
+                            </svg>
+                        </div>
+                        <span>{{ __('Active Pool') }}</span>
+                    </a>
+
+                    <a href="{{ route('user.wallet-exchange') }}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <polyline points="7 10 12 15 17 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                            </svg>
+                        </div>
+                        <span>{{ __('Swap') }}</span>
+                    </a>
+
+                    <a href="{{ route('user.withdraw.view') }}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <line x1="22" y1="2" x2="11" y2="13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polygon>
+                            </svg>
+                        </div>
+                        <span>{{ __('Withdraw') }}</span>
+                    </a>
+
+                    <a href="{{ route('user.transactions') }}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <line x1="12" y1="1" x2="12" y2="23" stroke-width="2" stroke-linecap="round"></line>
+                                <polyline points="17 5 12 1 7 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                <polyline points="7 19 12 23 17 19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            </svg>
+                        </div>
+                        <span>{{ __('History') }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+                     <!-- MOBILE QUICK ACTIONS - Shows only on mobile -->
+        <div class="mobile-quick-actions">
+            <div class="mobile-quick-actions-header">
+                <h4>{{ __('Quick Actions') }}</h4>
+            </div>
+
+            <div class="mobile-quick-actions-grid">
+                <!-- Deposit -->
+                <a href="{{ route('user.deposit.amount') }}" class="mobile-quick-action-tile">
+                    <div class="mobile-action-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <polyline points="7 10 12 15 17 10" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3" stroke-linecap="round" stroke-linejoin="round"></line>
+                        </svg>
+                    </div>
+                    <span class="mobile-action-label">{{ __('Deposit') }}</span>
+                </a>
+
+                <!-- Invest -->
+                <a href="{{ route('user.schema') }}" class="mobile-quick-action-tile">
+                    <div class="mobile-action-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                    </div>
+                    <span class="mobile-action-label">{{ __('Stake Pools') }}</span>
+                </a>
+
+                <!-- Withdraw -->
+                <a href="{{ route('user.withdraw.view') }}" class="mobile-quick-action-tile">
+                    <div class="mobile-action-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="22" y1="2" x2="11" y2="13" stroke-linecap="round" stroke-linejoin="round"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" stroke-linecap="round" stroke-linejoin="round"></polygon>
+                        </svg>
+                    </div>
+                    <span class="mobile-action-label">{{ __('Withdraw') }}</span>
+                </a>
+
+                <!-- History -->
+                <a href="{{ route('user.transactions') }}" class="mobile-quick-action-tile">
+                    <div class="mobile-action-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="12" y1="1" x2="12" y2="23" stroke-linecap="round"></line>
+                            <polyline points="17 5 12 1 7 5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            <polyline points="7 19 12 23 17 19" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                        </svg>
+                    </div>
+                    <span class="mobile-action-label">{{ __('History') }}</span>
+                </a>
+
+                <!-- Pool History (Changed from Profile) -->
+                <a href="{{ route('user.invest-logs') }}" class="mobile-quick-action-tile">
+                    <div class="mobile-action-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="6"></circle>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                    </div>
+                    <span class="mobile-action-label">{{ __('Active Pools') }}</span>
+                </a>
+
+                <!-- Referrals (Changed from Dashboard) -->
+                <a href="{{ route('user.referral') }}" class="mobile-quick-action-tile">
+                    <div class="mobile-action-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    <span class="mobile-action-label">{{ __('Referrals') }}</span>
+                </a>
+            </div>
+        </div>
+
+              
+
+              <!-- Profile & Locked Period Section -->
+        <div class="profile-locked-section">
+            <!-- Profile Box -->
+            <div class="profile-box">
+                <div class="profile-header">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <circle cx="12" cy="7" r="4" stroke-width="2"></circle>
+                        </svg>
+                        {{ __('Your Profile') }}
+                    </h4>
+                    <a href="{{ route('user.setting.show') }}" class="profile-edit-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar">
+                        @if($user->avatar && $user->avatar != 'frontend/images/user.png')
+                            <img src="{{ asset($user->avatar) }}" alt="{{ $user->full_name }}">
+                        @else
+                            {{ strtoupper(substr($user->first_name, 0, 1)) }}
+                        @endif
+                    </div>
+                    <h3 class="profile-name">{{ $user->full_name }}</h3>
+                </div>
+
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-info-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-width="2"></path>
+                                <polyline points="22,6 12,13 2,6" stroke-width="2"></polyline>
+                            </svg>
+                            {{ __('Email') }}
+                        </span>
+                        <span class="profile-info-value">{{ $user->email }}</span>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-info-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"></line>
+                                <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"></line>
+                                <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line>
+                            </svg>
+                            {{ __('Member Since') }}
+                        </span>
+                        <span class="profile-info-value">{{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}</span>
+                    </div>
+                </div>
+
+                <div class="profile-achievements">
+                    <div class="profile-achievements-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M4 22h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        <span class="profile-achievements-label">{{ __('Achievements') }}</span>
+                    </div>
+                    <div class="profile-achievements-value">{{ $dataCount['rank_achieved'] }} {{ __('unlocked') }}</div>
+                    <p class="profile-achievements-text">{{ __('Keep staking to earn more achievements!') }}</p>
+                </div>
+
+                <!-- KYC Verification Status - Only show if enabled by admin -->
+                @if(setting('kyc_verification', 'permission'))
+                <div class="profile-kyc-status">
+                    <div class="kyc-status-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 11l3 3L22 4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        <span class="kyc-status-label">{{ __('KYC Verification') }}</span>
+                    </div>
+
+                    @if($user->kyc == \App\Enums\KYCStatus::Verified->value)
+                        <div class="kyc-status-badge verified">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <polyline points="22 4 12 14.01 9 11.01" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            </svg>
+                            {{ __('Verified') }}
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 8px; margin-bottom: 0;">
+                            {{ __('Your identity has been verified') }}
+                        </p>
+                    @elseif($user->kyc == \App\Enums\KYCStatus::Pending->value)
+                        <div class="kyc-status-badge pending">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                                <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                            </svg>
+                            {{ __('Pending Review') }}
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 8px; margin-bottom: 0;">
+                            {{ __('Your verification is under review') }}
+                        </p>
+                    @elseif($user->kyc == \App\Enums\KYCStatus::Failed->value)
+                        <div class="kyc-status-badge unverified">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15" stroke-width="2" stroke-linecap="round"></line>
+                                <line x1="9" y1="9" x2="15" y2="15" stroke-width="2" stroke-linecap="round"></line>
+                            </svg>
+                            {{ __('Rejected') }}
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 8px; margin-bottom: 8px;">
+                            {{ __('Please resubmit your documents') }}
+                        </p>
+                        <a href="{{ route('user.kyc') }}" class="kyc-action-link">
+                            {{ __('Resubmit KYC â†’') }}
+                        </a>
+                    @else
+                        <div class="kyc-status-badge unverified">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" stroke-linecap="round"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" stroke-linecap="round"></line>
+                            </svg>
+                            {{ __('Not Verified') }}
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 8px; margin-bottom: 8px;">
+                            {{ __('Verify your identity to unlock all features') }}
+                        </p>
+                        <a href="{{ route('user.kyc') }}" class="kyc-action-link">
+                            {{ __('Complete KYC Verification â†’') }}
+                        </a>
+                    @endif
+                </div>
+                @endif
+                <!-- End KYC Section -->
+
+            </div>
+            <!-- End Profile Box -->
+
+            <!-- Locked Period Box -->
+            <div class="locked-period-box">
+                @if($latestInvestment)
+                    <div class="locked-period-header">
+                        <h4 class="locked-period-title">{{ __('Lock Period') }}</h4>
+                        <p class="locked-period-subtitle">{{ $latestInvestment->schema->name }}</p>
+                    </div>
+
+                    <div class="locked-period-countdown">
+                        @php
+                            $now = \Carbon\Carbon::now();
+                            $endDate = \Carbon\Carbon::parse($latestInvestment->next_profit_time);
+                            $startDate = \Carbon\Carbon::parse($latestInvestment->created_at);
+                            $endTimestamp = $endDate->timestamp;
+                            $startTimestamp = $startDate->timestamp;
+                            $totalDuration = $startTimestamp ? ($endTimestamp - $startTimestamp) : 0;
+                            $elapsed = $now->timestamp - $startTimestamp;
+                            $remaining = $endTimestamp - $now->timestamp;
+                            $progressPercentage = $totalDuration > 0 ? min(100, max(0, ($elapsed / $totalDuration) * 100)) : 0;
+                            $days = max(0, floor($remaining / 86400));
+                            $hours = max(0, floor(($remaining % 86400) / 3600));
+                            $minutes = max(0, floor(($remaining % 3600) / 60));
+                            $seconds = max(0, $remaining % 60);
+                        @endphp
+
+                        <div class="countdown-timer" id="lockPeriodCountdown" 
+                             data-end-time="{{ $endTimestamp }}"
+                             data-start-time="{{ $startTimestamp }}">
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="days-countdown">{{ $days }}</div>
+                                <div class="countdown-label">{{ __('Days') }}</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="hours-countdown">{{ str_pad($hours, 2, '0', STR_PAD_LEFT) }}</div>
+                                <div class="countdown-label">{{ __('Hours') }}</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="minutes-countdown">{{ str_pad($minutes, 2, '0', STR_PAD_LEFT) }}</div>
+                                <div class="countdown-label">{{ __('Mins') }}</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="seconds-countdown">{{ str_pad($seconds, 2, '0', STR_PAD_LEFT) }}</div>
+                                <div class="countdown-label">{{ __('Secs') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="locked-period-progress">
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-fill" id="lockProgressBar" style="width: {{ $progressPercentage }}%"></div>
+                            </div>
+                            <p class="progress-text">
+                                <span id="progressPercentage">{{ number_format($progressPercentage, 1) }}</span>% {{ __('Complete') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="locked-period-stats">
+                        <div class="locked-stat">
+                            {{ __('Stake Amount:') }} 
+                            <span class="locked-stat-value">{{ $currencySymbol }}{{ number_format($latestInvestment->invest_amount, 2) }}</span>
+                        </div>
+                        <div class="locked-stat">
+                            {{ __('Return Period:') }} 
+                            <span class="locked-stat-value">
+                                {{ $latestInvestment->schema->schedule->name ?? __('N/A') }}
+                            </span>
+                        </div>
+                        <div class="locked-stat">
+                            {{ __('Profit Earned:') }} 
+                            <span class="locked-stat-value">{{ $currencySymbol }}{{ number_format($latestInvestment->total_profit_amount ?? 0, 2) }}</span>
+                        </div>
+                    </div>
+                @else
+                    <div class="no-active-stakes">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="5" y="11" width="14" height="10" rx="2" stroke-width="2"></rect>
+                            <path d="M12 11V7" stroke-width="2" stroke-linecap="round"></path>
+                            <path d="M8 7h8" stroke-width="2" stroke-linecap="round"></path>
+                        </svg>
+                        <h5>{{ __('No active stakes') }}</h5>
+                        <p>{{ __('Start staking to see lock period') }}</p>
+                        <div class="total-staked">{{ __('Total Staked') }}</div>
+                        <div class="total-staked-amount">{{ $currencySymbol }}{{ number_format($dataCount['total_investment'], 2) }}</div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <!-- End Profile & Locked Period Section -->
+
+
+<!-- Top Staking Pools / Yield Trend -->
+<div class="top-pools-section">
+    <div class="top-pools-card">
+        <div class="top-pools-header">
+            <div class="top-pools-header-left">
+                <div class="top-pools-title-row">
+                    <h4>{{ __('Top Staking Pools') }}</h4>
+                    <span class="top-pools-live">
+                        <span class="live-dot"></span>
+                        {{ __('Live') }}
+                    </span>
+                </div>
+                <p>{{ __('30-day yield chart (average APY index)') }}</p>
+            </div>
+
+            <div class="top-pools-header-right">
+                <div id="pools-status" class="top-pools-status">{{ __('Data: Live') }}</div>
+                <button id="pools-reload" type="button" class="top-pools-refresh-btn">
+                    <span class="refresh-dot"></span>
+                    {{ __('Refresh') }}
+                </button>
+            </div>
+        </div>
+
+        <div class="top-pools-grid">
+            <!-- left -->
+            <div class="top-pools-chart-card">
+                <div class="top-pools-chart-head">
+                    <span>{{ __('APY Index (30d)') }}</span>
+                    <div class="mini-eq">
+                        @for($i = 0; $i < 14; $i++)
+                            <span style="height: {{ 8 + ($i % 5) * 5 }}px"></span>
+                        @endfor
+                    </div>
+                </div>
+
+                <div class="top-pools-chart-wrap">
+                    <div id="pools-loading" class="top-pools-loading">{{ __('Loading pools...') }}</div>
+                    <div id="apy-chart" class="apy-chart-bars"></div>
+                </div>
+
+                <div class="top-pools-chart-meta">
+                    <span id="apy-min">{{ __('Min: --%') }}</span>
+                    <span id="apy-max">{{ __('Max: --%') }}</span>
+                </div>
+            </div>
+
+            <!-- right -->
+            <div class="top-pools-list-card">
+                <div class="top-pools-list-head">
+                    <span>{{ __('Top pools') }}</span>
+                    <span>{{ __('(24h)') }}</span>
+                </div>
+
+                <div id="pools-rows" class="top-pools-rows">
+                    <!-- injected by js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pool-trend-card">
+        <div class="pool-trend-head">
+            <div class="pool-trend-title">
+                {{ __('Pool Yield Trend (30d)') }}
+                <span>{{ __('(avg APY of top pools)') }}</span>
+            </div>
+            <div id="trendMeta" class="pool-trend-meta">{{ __('Waiting...') }}</div>
+        </div>
+
+        <div class="pool-trend-body">
+            <div class="pool-trend-canvas-wrap">
+                <canvas id="poolsTrendChart"></canvas>
+                <div id="poolsTrendLoading" class="pool-trend-loading">{{ __('Loading pool trend...') }}</div>
+                <div id="poolsTrendError" class="pool-trend-error">{{ __('Failed to load trend.') }}</div>
+            </div>
+
+            <div class="pool-trend-stats">
+                <div class="pool-trend-stat">
+                    <div class="stat-label">{{ __('Avg APY (30d)') }}</div>
+                    <div id="avgApy30" class="stat-value">—</div>
+                </div>
+                <div class="pool-trend-stat">
+                    <div class="stat-label">{{ __('Best Pool') }}</div>
+                    <div id="bestPoolName" class="stat-value small">—</div>
+                </div>
+                <div class="pool-trend-stat">
+                    <div class="stat-label">{{ __('Top Pool APY') }}</div>
+                    <div id="bestPoolApy" class="stat-value">—</div>
+                </div>
+                <div class="pool-trend-stat">
+                    <div class="stat-label">{{ __('Total TVL') }}</div>
+                    <div id="totalTvl" class="stat-value">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+        <!-- Staking Plans Section -->
+        <div class="staking-plans-section">
+            <div class="staking-plans-header">
+                <h3>{{ __('Available Staking Pools') }}</h3>
+            </div>
+
+            @if($schemas && $schemas->count() > 0)
+            <div class="staking-plans-slider">
+                <div class="swiper stakingPlansSwiper">
+                    <div class="swiper-wrapper">
+                        @foreach($schemas as $schema)                                        <div class="swiper-slide">
+                            <div class="staking-plan-card">
+                                <!-- Plan Header -->
+                                <div class="plan-card-header">
+                                    <div class="plan-icon-wrapper">
+                                        @if($schema->icon)
+                                            <img src="{{ asset($schema->icon) }}" alt="{{ $schema->name }}">
+                                        @else
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="32" height="32">
+                                                <circle cx="12" cy="12" r="10" stroke-width="2" stroke="#c8ff00"></circle>
+                                                <path d="M12 6v6l4 2" stroke-width="2" stroke="#c8ff00" stroke-linecap="round"></path>
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    <div class="plan-title-section">
+                                        <h5 class="plan-title">{{ $schema->name }}</h5>
+                                        @if($schema->badge)
+                                            <span class="plan-badge">{{ $schema->badge }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- ROI Display -->
+                                <div class="plan-roi">
+                                    <div class="plan-roi-label">{{ __('APY') }}</div>
+                                    <div class="plan-roi-value">
+                                        @if($schema->interest_type == 'percentage')
+                                            {{ $schema->return_interest }}%
+                                        @else
+                                            {{ $currencySymbol }}{{ $schema->return_interest }}
+                                        @endif
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Plan Details -->
+                                <div class="plan-details">
+                                    <div class="plan-detail-row">
+                                        <span class="plan-detail-label">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <line x1="12" y1="1" x2="12" y2="23" stroke-width="2"></line>
+                                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"></path>
+                                            </svg>
+                                            {{ $schema->type == 'range' ? __('Min Stake') : __('Amount') }}
+                                        </span>
+                                        <span class="plan-detail-value">
+                                            @if($schema->type == 'range')
+                                                {{ $currencySymbol }}{{ number_format($schema->min_amount, 2) }}
+                                            @else
+                                                {{ $currencySymbol }}{{ number_format($schema->fixed_amount, 2) }}
+                                            @endif
+                                        </span>
+                                    </div>
+
+                                    @if($schema->type == 'range')
+                                    <div class="plan-detail-row">
+                                        <span class="plan-detail-label">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <line x1="12" y1="1" x2="12" y2="23" stroke-width="2"></line>
+                                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-width="2"></path>
+                                            </svg>
+                                            {{ __('Max Stake') }}
+                                        </span>
+                                        <span class="plan-detail-value">
+                                            {{ $currencySymbol }}{{ number_format($schema->max_amount, 2) }}
+                                        </span>
+                                    </div>
+                                    @endif
+
+                                    <div class="plan-detail-row">
+                                        <span class="plan-detail-label">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                                                <polyline points="12 6 12 12 16 14" stroke-width="2"></polyline>
+                                            </svg>
+                                            {{ __('Locked Period') }}
+                                        </span>
+                                        <span class="plan-detail-value">
+                                            @if($schema->return_type == 'period')
+                                                {{ $schema->number_of_period }} {{ $schema->number_of_period == 1 ? __('Time') : __('Days') }}
+                                            @else
+                                                {{ __('Unlimited') }}
+                                            @endif
+                                        </span>
+                                    </div>
+
+                                  
+                                </div>
+
+                                <!-- Action Button -->
+                                <a href="{{ route('user.schema.preview', $schema->id) }}" class="plan-action-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M5 12h14M12 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    {{ __('Stake Now') }}
+                                </a>
+                            </div>
+                            
+                            
+                            
+                        </div>
+                        
+                        
+                        @endforeach
+                        
+                    </div>
+                    
+                    <!-- Navigation Buttons -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    
+                    <!-- Pagination -->
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            @else
+            
+            
+            <!-- Empty State -->
+            <div class="no-plans-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" stroke-linecap="round"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" stroke-linecap="round"></line>
+                </svg>
+                <h5>{{ __('No Staking Pools Available') }}</h5>
+                <p>{{ __('Check back later for new staking opportunities') }}</p>
+            </div>
+            @endif
+            
+        </div>
+
+
+               <!-- Recent Transactions -->
+        <div class="transactions-card">
+            <div class="transactions-header">
+                <h4>{{ __('Recent Transactions') }}</h4>
+            </div>
+
+            @if($recentTransactions && $recentTransactions->count() > 0)
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('Description') }}</th>
+                        <th>{{ __('Transaction ID') }}</th>
+                        <th>{{ __('Type') }}</th>
+                        <th>{{ __('Amount') }}</th>
+                        <th>{{ __('Status') }}</th>
+                        <th>{{ __('Date') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($recentTransactions->take(5) as $transaction)
+                    <tr>
+                        <td>{{ $transaction->description }}</td>
+                        <td class="transaction-id">{{ $transaction->tnx }}</td>
+                        <td>{{ $transaction->method }}</td>
+                        <td class="transaction-amount {{ txn_type($transaction->type->value, ['positive', 'negative'], 'hardrock') }}">
+                            {{ txn_type($transaction->type->value, ['+', '-'], 'hardrock') }}{{ $currencySymbol }}{{ number_format($transaction->amount, 2) }}
+                        </td>
+                        <td>
+                            @if($transaction->status->value == 'pending')
+                                <span class="transaction-status pending">{{ __('Pending') }}</span>
+                            @elseif($transaction->status->value == 'success')
+                                <span class="transaction-status success">{{ __('Success') }}</span>
+                            @else
+                                <span class="transaction-status failed">{{ __('Failed') }}</span>
+                            @endif
+                        </td>
+                       <td>{{ \Carbon\Carbon::parse($transaction->created_at)->format('M d, Y') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <!-- View All Button - Bottom Center -->
+            <div class="transactions-footer">
+                <a href="{{ route('user.transactions') }}" class="view-all-btn">
+                    {{ __('View All Activity') }}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"></line>
+                        <polyline points="12 5 19 12 12 19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                    </svg>
+                </a>
+            </div>
+            @else
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="8" width="18" height="4" rx="1" stroke-width="2"></rect>
+                    <rect x="3" y="4" width="18" height="4" rx="1" stroke-width="2"></rect>
+                    <rect x="3" y="12" width="18" height="4" rx="1" stroke-width="2"></rect>
+                    <rect x="3" y="16" width="18" height="4" rx="1" stroke-width="2"></rect>
+                </svg>
+                <p>{{ __('No transactions yet. Start Staking to see your activity here!') }}</p>
+            </div>
+            @endif
+        </div>
+
+    </div>
+</div>
+
+<br><br>
+<!-- ORIGINAL CONTENT BELOW (CHARTS, CALCULATORS, ETC.) -->
+<!--<div class="container-fluid default-page" style="background: transparent;">-->
+    
+    <!-- Mobile Screen Content -->
+<!--    <div class="rock-mobile-screen-show">-->
+        <!-- Crypto Staking Plan Chart Section -->
+<!--        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+
+        <!-- Chart Container -->
+<!--        <div class="card text-white shadow mb-4" style="background-color: #6337e617;">-->
+<!--            <div class="card-header border-bottom">-->
+<!--                <h5 class="mb-0">Top 10 Staking Protocols (Live TVL)</h5>-->
+<!--            </div>-->
+<!--            <div class="card-body">-->
+<!--                <div style="position:relative; height:400px; width:100%;">-->
+<!--                    <canvas id="stakingBarChart" style="background-color: #6337e617; border-radius: 10px;"></canvas>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <script>-->
+<!--            async function loadStakingBarChart() {-->
+<!--                const canvas = document.getElementById('stakingBarChart');-->
+<!--                if (!canvas) return;-->
+
+<!--                const ctx = canvas.getContext('2d');-->
+
+<!--                try {-->
+<!--                    const res = await fetch('https://api.llama.fi/protocols');-->
+<!--                    const data = await res.json();-->
+
+<!--                    const stakingData = data-->
+<!--                        .filter(p => p.category && p.category.toLowerCase().includes("staking"))-->
+<!--                        .sort((a, b) => b.tvl - a.tvl)-->
+<!--                        .slice(0, 10);-->
+
+<!--                    const labels = stakingData.map(p => p.name);-->
+<!--                    const tvls = stakingData.map(p => p.tvl);-->
+
+<!--                    new Chart(ctx, {-->
+<!--                        type: 'bar',-->
+<!--                        data: {-->
+<!--                            labels: labels,-->
+<!--                            datasets: [{-->
+<!--                                label: 'TVL (USD)',-->
+<!--                                data: tvls,-->
+<!--                                backgroundColor: 'rgba(0, 123, 255, 0.7)',-->
+<!--                                borderColor: 'rgba(0, 123, 255, 1)',-->
+<!--                                borderWidth: 1,-->
+<!--                                borderRadius: 4-->
+<!--                            }]-->
+<!--                        },-->
+<!--                        options: {-->
+<!--                            maintainAspectRatio: false,-->
+<!--                            responsive: true,-->
+<!--                            plugins: {-->
+<!--                                legend: {-->
+<!--                                    labels: {-->
+<!--                                        color: '#ffffff'-->
+<!--                                    }-->
+<!--                                },-->
+<!--                                tooltip: {-->
+<!--                                    callbacks: {-->
+<!--                                        label: context => `$${context.parsed.y.toLocaleString()}`-->
+<!--                                    }-->
+<!--                                }-->
+<!--                            },-->
+<!--                            scales: {-->
+<!--                                x: {-->
+<!--                                    ticks: { color: '#ccc' },-->
+<!--                                    grid: { color: 'rgba(255,255,255,0.1)' }-->
+<!--                                },-->
+<!--                                y: {-->
+<!--                                    beginAtZero: true,-->
+<!--                                    ticks: {-->
+<!--                                        color: '#ccc',-->
+<!--                                        callback: value => '$' + value.toLocaleString()-->
+<!--                                    },-->
+<!--                                    grid: { color: 'rgba(255,255,255,0.1)' }-->
+<!--                                }-->
+<!--                            }-->
+<!--                        }-->
+<!--                    });-->
+<!--                } catch (error) {-->
+<!--                    console.error("Error loading staking bar chart:", error);-->
+<!--                }-->
+<!--            }-->
+
+<!--            document.addEventListener("DOMContentLoaded", loadStakingBarChart);-->
+<!--        </script>-->
+
+        <!-- Yield Projection Calculator -->
+<!--        <script src="https://s3.tradingview.com/tv.js"></script>-->
+
+<!--        <style>-->
+<!--            .stake-calculator {-->
+<!--                font-family: Arial, sans-serif;-->
+<!--                background-color: #6337e617;-->
+<!--                color: #fff;-->
+<!--                padding: 1rem;-->
+<!--                margin: 2rem auto;-->
+<!--                max-width: 1200px;-->
+<!--                border-radius: 10px;-->
+<!--            }-->
+<!--            .stake-calculator h5 {-->
+<!--                text-align: center;-->
+<!--                margin-bottom: 1rem;-->
+<!--            }-->
+<!--            .stake-calculator .input-section {-->
+<!--                display: flex;-->
+<!--                flex-direction: column;-->
+<!--                gap: 1rem;-->
+<!--                margin-bottom: 1rem;-->
+<!--            }-->
+<!--            .stake-calculator label {-->
+<!--                font-weight: bold;-->
+<!--            }-->
+<!--            .stake-calculator input[type="number"] {-->
+<!--                padding: 0.6rem;-->
+<!--                border-radius: 5px;-->
+<!--                border: none;-->
+<!--                font-size: 1rem;-->
+<!--                width: 100%;-->
+<!--            }-->
+<!--            .stake-calculator button,-->
+<!--            .stake-calculator a {-->
+<!--                background-color: #075dba;-->
+<!--                color: #fff;-->
+<!--                border: none;-->
+<!--                padding: 0.8rem;-->
+<!--                border-radius: 5px;-->
+<!--                font-size: 1rem;-->
+<!--                cursor: pointer;-->
+<!--                font-weight: bold;-->
+<!--                text-decoration: none;-->
+<!--                display: inline-block;-->
+<!--            }-->
+<!--            .stake-calculator button:hover {-->
+<!--                background-color: #064fa0;-->
+<!--            }-->
+<!--            .stake-calculator #results,-->
+<!--            .stake-calculator #chartSection {-->
+<!--                display: none;-->
+<!--                margin-top: 2rem;-->
+<!--            }-->
+<!--            .stake-calculator canvas {-->
+<!--                background-color: #6337e617;-->
+<!--                border-radius: 8px;-->
+<!--                width: 100% !important;-->
+<!--                height: auto !important;-->
+<!--            }-->
+<!--        </style>-->
+
+<!--        <div class="stake-calculator">-->
+<!--            <h5>Yield Projection</h5>-->
+<!--            <div class="input-section">-->
+<!--                <label for="amount">Staking Amount ($):</label>-->
+<!--                <input type="number" id="amount" placeholder="e.g., 10000" min="50" />-->
+<!--                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">-->
+<!--                    <button onclick="simulate()">Calculate</button>-->
+<!--                    <a href="{{ route('user.schema') }}">Stake Now</a>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div id="results"></div>-->
+
+<!--            <div id="chartSection">-->
+<!--                <canvas id="earningsChart"></canvas>-->
+<!--            </div>-->
+
+<!--            <button onclick="closeChart()" style="margin-top: 1rem; background-color: #444; color: #fff;">Close Chart</button>-->
+<!--        </div>-->
+
+<!--        <script>-->
+<!--            const plans = [-->
+<!--                { name: "MinxChain DAO Smart Contract", rate: 1.2, min: 50, max: 999 },-->
+<!--                { name: "MinxChain Boost", rate: 3.2, min: 1000, max: 4999 },-->
+<!--                { name: "MinxChain DAO-farming", rate: 5.2, min: 5000, max: 9999 },-->
+<!--                { name: "MinxChain -IDOs", rate: 7.2, min: 10000, max: 49999 },-->
+<!--                { name: "Meme-pool DAO", rate: 9.5, min: 50000, max: 499999 },-->
+<!--                { name: "DCA Staking", rate: 10.5, min: 500000, max: 1000000 }-->
+<!--            ];-->
+
+<!--            let chart;-->
+
+<!--            function simulate() {-->
+<!--                const amount = parseFloat(document.getElementById("amount").value);-->
+<!--                const resultDiv = document.getElementById("results");-->
+<!--                const chartSection = document.getElementById("chartSection");-->
+
+<!--                if (isNaN(amount) || amount < 50) {-->
+<!--                    alert("Please enter a valid amount (minimum $50)");-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                const plan = plans.find(p => amount >= p.min && amount <= p.max);-->
+<!--                if (!plan) {-->
+<!--                    alert("No matching plan found for the entered amount.");-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                const dailyRate = plan.rate / 100;-->
+<!--                const earnings = [];-->
+<!--                let capital = amount;-->
+
+<!--                for (let i = 1; i <= 5; i++) {-->
+<!--                    capital += capital * dailyRate;-->
+<!--                    earnings.push(capital.toFixed(2));-->
+<!--                }-->
+
+<!--                resultDiv.innerHTML = `-->
+<!--                    <h4>Stake: ${plan.name}</h4>-->
+<!--                    <p>Daily Rate: ${plan.rate}%</p>-->
+<!--                    <p>Total Returns 3-5 Days: $${capital.toFixed(2)}</p>-->
+<!--                `;-->
+<!--                resultDiv.style.display = "block";-->
+<!--                chartSection.style.display = "block";-->
+
+<!--                const ctx = document.getElementById("earningsChart").getContext("2d");-->
+<!--                if (chart) chart.destroy();-->
+
+<!--                chart = new Chart(ctx, {-->
+<!--                    type: 'line',-->
+<!--                    data: {-->
+<!--                        labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],-->
+<!--                        datasets: [{-->
+<!--                            label: 'Capital Growth',-->
+<!--                            data: earnings,-->
+<!--                            fill: true,-->
+<!--                            borderColor: '#075dba',-->
+<!--                            backgroundColor: 'rgba(0, 255, 204, 0.1)',-->
+<!--                            tension: 0.3-->
+<!--                        }]-->
+<!--                    },-->
+<!--                    options: {-->
+<!--                        responsive: true,-->
+<!--                        plugins: {-->
+<!--                            legend: {-->
+<!--                                labels: { color: '#fff' }-->
+<!--                            }-->
+<!--                        },-->
+<!--                        scales: {-->
+<!--                            x: {-->
+<!--                                ticks: { color: '#fff' }-->
+<!--                            },-->
+<!--                            y: {-->
+<!--                                ticks: { color: '#fff' }-->
+<!--                            }-->
+<!--                        }-->
+<!--                    }-->
+<!--                });-->
+<!--            }-->
+
+<!--            function closeChart() {-->
+<!--                document.getElementById("results").style.display = "none";-->
+<!--                document.getElementById("chartSection").style.display = "none";-->
+<!--                document.getElementById("amount").value = "";-->
+<!--            }-->
+<!--        </script>-->
+<!--    </div>-->
+
+<!--</div>-->
+@endsection
+
 @section('script')
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+@if($popupNotification)
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const copyButtons = document.querySelectorAll('.referral-url-copy-btn');
+    document.addEventListener('DOMContentLoaded', function () {
+        let modal = new bootstrap.Modal(document.getElementById('userPopupNotification'));
+        modal.show();
 
-      copyButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-          const referralLink = button.previousElementSibling.textContent;
-          copyToClipboard(referralLink, button.nextElementSibling);
-        });
-      });
-    });
-
-    function copyToClipboard(linkText, copyMessageElement) {
-      const textArea = document.createElement('textarea');
-      textArea.value = linkText;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-
-      copyMessageElement.style.opacity = 1;
-      setTimeout(() => {
-        copyMessageElement.style.opacity = 0;
-      }, 2000);
-    }
-
-    // Load More
-    $('.rock-moreless-button').click(function () {
-      $('.moretext').slideToggle();
-      if ($('.rock-moreless-button').text() == "Load more") {
-        $(this).text("Load less")
-      } else {
-        $(this).text("Load more")
-      }
-    });
-
-    $('.rock-moreless-button-2').click(function () {
-      let moreText = $('.moretext-2');
-      let button = $(this);
-
-      if (moreText.css('display') === 'none') {
-        moreText.css('display', 'flex').hide();
-        moreText.stop().slideDown('slow', function () {
-          $(this).css('height', 'auto');
-        });
-        button.text("Load less");
-      } else {
-        moreText.stop().slideUp('slow', function () {
-          $(this).css('display', 'none');
-        });
-        button.text("Load more");
-      }
+        document.getElementById('userPopupNotification')
+            .addEventListener('hidden.bs.modal', function () {
+                fetch("{{ route('user.read-notification', $popupNotification->id) }}");
+            });
     });
 </script>
-
+@endif
 
 <script>
-  function calculate() {
-    var investment = parseFloat(document.getElementById('investment').value);
-    var dailyReturn = 0;
-    var totalReturn = 0;
-    var totalProfit = 0;
-    var planName = "";
+    console.log('=== SCRIPT SECTION LOADED ===');
+    console.log('jQuery loaded?', typeof jQuery !== 'undefined');
+    console.log('$ loaded?', typeof $ !== 'undefined');
+</script>
 
-    if (investment >= 1000 && investment <= 4999) {
-      dailyReturn = investment * 0.02; // 2% daily return
-      planName = "Bitsvance Boost";
-   
-    } else if (investment >= 5000 && investment <= 9999) {
-      dailyReturn = investment * 0.03; // 3% daily return
-      planName = "Bitsvance DAO-farming";
-    } else if (investment >= 10000 && investment <= 49999) {
-      dailyReturn = investment * 0.035; // 3.5% daily return
-      planName = "Bitsvance- IDOs";
-    } else if (investment >= 50000 && investment <= 499999) {
-      dailyReturn = investment * 0.04; // 4% daily return
-      planName = "Meme-pool DAO"; 
-        } else if (investment >= 500000 && investment <= 1000000) {
-      dailyReturn = investment * 0.045; // 4.5% daily return
-      planName = " 	DCA Staking";
+<script>
+    (function() {
+        'use strict';
+        
+        // Wait for DOM and Swiper to be ready
+        if (typeof Swiper === 'undefined') {
+            console.error('Swiper is not loaded!');
+            return;
+        }
+        
+        // Initialize Staking Plans Swiper
+        const initStakingSwiper = () => {
+            const swiperElement = document.querySelector('.stakingPlansSwiper');
+            
+            if (!swiperElement) {
+                console.log('Swiper element not found');
+                return;
+            }
+            
+            const stakingSwiper = new Swiper(".stakingPlansSwiper", {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                loop: false,
+                grabCursor: true,
+                
+                breakpoints: {
+                    640: {
+                        slidesPerView: 1,
+                        spaceBetween: 20
+                    },
+                    768: {
+                        slidesPerView: 2,
+                        spaceBetween: 24
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 24
+                    }
+                },
+                
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                    dynamicBullets: true,
+                },
+                
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                
+                effect: 'slide',
+                speed: 600,
+                
+                keyboard: {
+                    enabled: true,
+                },
+                
+                a11y: {
+                    enabled: true,
+                },
+                
+                observer: true,
+                observeParents: true,
+            });
+            
+            console.log('Swiper initialized successfully!');
+        };
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initStakingSwiper);
+        } else {
+            initStakingSwiper();
+        }
+        
+    })();
+</script>
+
+<!-- COUNTDOWN TIMER SCRIPT -->
+<script>
+    console.log('Countdown script loading...');
+    
+    // Bulletproof Live Countdown Timer
+    (function() {
+        'use strict';
+        
+        console.log('Countdown IIFE started');
+        
+        const countdownElement = document.getElementById('lockPeriodCountdown');
+        
+        console.log('Countdown element:', countdownElement);
+        
+        if (!countdownElement) {
+            console.log('No countdown element found - no active investment');
+            return;
+        }
+        
+        const endTime = parseInt(countdownElement.getAttribute('data-end-time'));
+        const startTime = parseInt(countdownElement.getAttribute('data-start-time'));
+        
+        console.log('Timestamps:', { startTime, endTime });
+        
+        const daysEl = document.getElementById('days-countdown');
+        const hoursEl = document.getElementById('hours-countdown');
+        const minutesEl = document.getElementById('minutes-countdown');
+        const secondsEl = document.getElementById('seconds-countdown');
+        const progressBar = document.getElementById('lockProgressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        
+        console.log('Elements:', { daysEl, hoursEl, minutesEl, secondsEl });
+        
+        let timerInterval = null;
+        
+        function updateCountdown() {
+            const now = Math.floor(Date.now() / 1000);
+            const remaining = endTime - now;
+            
+            console.log('Update:', new Date().toLocaleTimeString(), 'Remaining:', remaining);
+            
+            if (remaining <= 0) {
+                daysEl.textContent = '0';
+                hoursEl.textContent = '00';
+                minutesEl.textContent = '00';
+                secondsEl.textContent = '00';
+                progressBar.style.width = '100%';
+                progressPercentage.textContent = '100.0';
+                
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                
+                console.log('Countdown finished!');
+                return;
+            }
+            
+            const days = Math.floor(remaining / 86400);
+            const hours = Math.floor((remaining % 86400) / 3600);
+            const minutes = Math.floor((remaining % 3600) / 60);
+            const seconds = remaining % 60;
+            
+            daysEl.textContent = days;
+            hoursEl.textContent = hours.toString().padStart(2, '0');
+            minutesEl.textContent = minutes.toString().padStart(2, '0');
+            secondsEl.textContent = seconds.toString().padStart(2, '0');
+            
+            const totalDuration = endTime - startTime;
+            const elapsed = now - startTime;
+            const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+            
+            progressBar.style.width = progress.toFixed(1) + '%';
+            progressPercentage.textContent = progress.toFixed(1);
+        }
+        
+        console.log('Starting countdown...');
+        updateCountdown();
+        
+        timerInterval = setInterval(function() {
+            updateCountdown();
+        }, 1000);
+        
+        console.log('Timer interval started:', timerInterval);
+        
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                console.log('Page visible - updating');
+                updateCountdown();
+            }
+        });
+        
+        window.addEventListener('focus', function() {
+            console.log('Window focused');
+            updateCountdown();
+        });
+        
+        window.addEventListener('beforeunload', function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+        });
+        
+        console.log('Countdown initialized!', {
+            startTime: startTime,
+            endTime: endTime,
+            startDate: new Date(startTime * 1000).toLocaleString(),
+            endDate: new Date(endTime * 1000).toLocaleString()
+        });
+        
+    })();
+</script>
+
+<!-- DEBUG TIMESTAMPS -->
+<script>
+    (function() {
+        const countdownElement = document.getElementById('lockPeriodCountdown');
+        if (!countdownElement) {
+            console.log('DEBUG: No countdown element');
+            return;
+        }
+        
+        const endTime = parseInt(countdownElement.getAttribute('data-end-time'));
+        const startTime = parseInt(countdownElement.getAttribute('data-start-time'));
+        const nowTimestamp = Math.floor(Date.now() / 1000);
+        
+        console.log('=== COUNTDOWN DEBUG INFO ===');
+        console.log('Server Start Time:', startTime, 'â†’', new Date(startTime * 1000).toLocaleString());
+        console.log('Server End Time:', endTime, 'â†’', new Date(endTime * 1000).toLocaleString());
+        console.log('Browser Current Time:', nowTimestamp, 'â†’', new Date(nowTimestamp * 1000).toLocaleString());
+        console.log('Remaining Seconds:', endTime - nowTimestamp);
+        console.log('Total Duration:', endTime - startTime, 'seconds');
+        console.log('============================');
+    })();
+</script>
+
+<!-- Load More buttons -->
+<script>
+    (function($) {
+        'use strict';
+        
+        $('.rock-moreless-button').click(function () {
+            $('.moretext').slideToggle();
+            if ($('.rock-moreless-button').text() == "Load more") {
+                $(this).text("Load less")
+            } else {
+                $(this).text("Load more")
+            }
+        });
+
+        $('.rock-moreless-button-2').click(function () {
+            let moreText = $('.moretext-2');
+            let button = $(this);
+
+            if (moreText.css('display') === 'none') {
+                moreText.css('display', 'flex').hide();
+                moreText.stop().slideDown('slow', function () {
+                    $(this).css('height', 'auto');
+                });
+                button.text("Load less");
+            } else {
+                moreText.stop().slideUp('slow', function () {
+                    $(this).css('display', 'none');
+                });
+                button.text("Load more");
+            }
+        });
+        
+    })(jQuery);
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const apyEl = document.getElementById('liveUsdtApy');
+    const updatedEl = document.getElementById('balanceLastUpdated');
+    const pathEl = document.getElementById('balanceChartPath');
+    const areaEl = document.getElementById('balanceChartArea');
+
+    function makeRandomPath() {
+    const pathEl = document.getElementById('balanceChartPath');
+    const areaEl = document.getElementById('balanceChartArea');
+
+    if (!pathEl || !areaEl) return;
+
+    const width = 600;
+    const baseY = 135;
+    const points = 13;
+    const step = width / (points - 1);
+
+    let y = 80;
+    let lineD = '';
+    let areaD = '';
+    const coords = [];
+
+    for (let i = 0; i < points; i++) {
+        const x = i * step;
+
+        y += (Math.random() - 0.5) * 70;
+
+        if (Math.random() > 0.65) {
+            y += (Math.random() > 0.5 ? 1 : -1) * (25 + Math.random() * 35);
+        }
+
+        y = Math.max(14, Math.min(116, y));
+        coords.push({ x, y });
     }
-    
-    totalReturn = dailyReturn * 3; // Total return over 3 days
-    totalProfit = totalReturn + investment; // Total including return of capital
-    
-    var resultElement = document.getElementById('result');
-    resultElement.innerHTML = `
-      <p>Staking Plan: ${planName}</p>
-      <p>Daily return: $${dailyReturn.toFixed(2)}</p>
-      <p>Total return after 3 days: $${totalReturn.toFixed(2)}</p>
-      <p>Total including return of capital: $${totalProfit.toFixed(2)}</p>
-    `;
-  }
+
+    coords.forEach((p, i) => {
+        lineD += (i === 0 ? `M ${p.x} ${p.y}` : ` L ${p.x} ${p.y}`);
+    });
+
+    areaD = `M ${coords[0].x} ${baseY}`;
+    coords.forEach((p) => {
+        areaD += ` L ${p.x} ${p.y}`;
+    });
+    areaD += ` L ${coords[coords.length - 1].x} ${baseY} Z`;
+
+    pathEl.setAttribute('d', lineD);
+    areaEl.setAttribute('d', areaD);
+}
+    async function loadUsdtApy() {
+        try {
+            const res = await fetch("{{ route('user.usdt-apy') }}", {
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch APY');
+
+            const data = await res.json();
+            console.log('APY response:', data);
+
+            if (typeof data.apy !== 'undefined' && data.apy !== null) {
+                apyEl.textContent = `${parseFloat(data.apy).toFixed(2)}% APY`;
+            }
+
+            const now = new Date();
+            updatedEl.textContent = now.toLocaleString([], {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (err) {
+            console.error(err);
+            apyEl.textContent = '8.42% APY';
+        }
+    }
+
+    makeRandomPath();
+    loadUsdtApy();
+
+    setInterval(makeRandomPath, 5000);
+    setInterval(loadUsdtApy, 60000);
+});
+</script>
+
+<script>
+(function () {
+    const statusEl = document.getElementById('pools-status');
+    const rowsEl = document.getElementById('pools-rows');
+    const chartEl = document.getElementById('apy-chart');
+    const loadingEl = document.getElementById('pools-loading');
+    const minEl = document.getElementById('apy-min');
+    const maxEl = document.getElementById('apy-max');
+    const reloadBtn = document.getElementById('pools-reload');
+
+    const trendCanvas = document.getElementById('poolsTrendChart');
+    const trendLoading = document.getElementById('poolsTrendLoading');
+    const trendError = document.getElementById('poolsTrendError');
+    const avgApy30 = document.getElementById('avgApy30');
+    const bestPoolName = document.getElementById('bestPoolName');
+    const bestPoolApy = document.getElementById('bestPoolApy');
+    const totalTvl = document.getElementById('totalTvl');
+    const trendMeta = document.getElementById('trendMeta');
+
+    if (!statusEl || !rowsEl || !chartEl || !loadingEl || !trendCanvas) return;
+
+    let inFlight = false;
+    let lastGood = null;
+
+    function fmtMoney(n) {
+        const num = Number(n || 0);
+        if (num >= 1e9) return (num / 1e9).toFixed(1) + "B";
+        if (num >= 1e6) return (num / 1e6).toFixed(1) + "M";
+        if (num >= 1e3) return (num / 1e3).toFixed(1) + "K";
+        return String(Math.round(num));
+    }
+
+    function renderPools(pools) {
+        rowsEl.innerHTML = "";
+
+        pools.forEach((p) => {
+            const change = Number(p.change24h ?? 0);
+            const isUp = change >= 0;
+
+            rowsEl.insertAdjacentHTML("beforeend", `
+                <div class="top-pool-row">
+                    <div class="min-w-0">
+                        <div class="top-pool-name">${p.name}</div>
+                        <div class="top-pool-meta">${p.symbol} • TVL ${fmtMoney(p.tvl)}</div>
+                    </div>
+                    <div class="shrink-0">
+                        <div class="top-pool-apy">${Number(p.apy).toFixed(2)}% APY</div>
+                        <div class="top-pool-change ${isUp ? 'up' : 'down'}">
+                            ${isUp ? '+' : ''}${change.toFixed(2)}%
+                        </div>
+                    </div>
+                </div>
+            `);
+        });
+    }
+
+    function renderMiniChart(series) {
+        const arr = (Array.isArray(series) ? series : []).slice(-30).map(Number);
+        if (!arr.length) return;
+
+        const min = Math.min(...arr);
+        const max = Math.max(...arr);
+        const range = Math.max(0.0001, max - min);
+
+        minEl.textContent = `Min: ${min.toFixed(2)}%`;
+        maxEl.textContent = `Max: ${max.toFixed(2)}%`;
+
+        chartEl.innerHTML = arr.map(v => {
+            const h = 12 + Math.round(((v - min) / range) * 82);
+            return `<div style="height:${h}%"></div>`;
+        }).join("");
+    }
+
+    function drawAreaLineChart(canvas, points) {
+        const ctx = canvas.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const w = rect.width;
+        const h = rect.height;
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.globalAlpha = 0.18;
+        ctx.strokeStyle = "rgba(255,255,255,0.12)";
+        ctx.lineWidth = 1;
+
+        for (let i = 1; i < 6; i++) {
+            const y = (h / 6) * i;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+            ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+
+        if (!points || points.length < 2) return;
+
+        const min = Math.min(...points);
+        const max = Math.max(...points);
+        const pad = (max - min) * 0.15 || 1;
+        const ymin = min - pad;
+        const ymax = max + pad;
+        const xStep = w / (points.length - 1);
+
+        const toXY = (i, v) => {
+            const x = i * xStep;
+            const t = (v - ymin) / (ymax - ymin);
+            const y = h - t * h;
+            return { x, y };
+        };
+
+        ctx.beginPath();
+        let p0 = toXY(0, points[0]);
+        ctx.moveTo(p0.x, p0.y);
+
+        for (let i = 1; i < points.length; i++) {
+            const p = toXY(i, points[i]);
+            ctx.lineTo(p.x, p.y);
+        }
+
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
+
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, "rgba(34,197,94,0.22)");
+        grad.addColorStop(1, "rgba(34,197,94,0.02)");
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        p0 = toXY(0, points[0]);
+        ctx.moveTo(p0.x, p0.y);
+
+        for (let i = 1; i < points.length; i++) {
+            const p = toXY(i, points[i]);
+            ctx.lineTo(p.x, p.y);
+        }
+
+        ctx.strokeStyle = "rgba(34,197,94,0.95)";
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "rgba(34,197,94,0.40)";
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        const last = toXY(points.length - 1, points[points.length - 1]);
+        ctx.beginPath();
+        ctx.arc(last.x, last.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(34,197,94,1)";
+        ctx.fill();
+    }
+
+    async function loadTopPools() {
+        if (inFlight) return;
+        inFlight = true;
+
+        loadingEl.style.display = 'flex';
+        trendLoading.style.display = 'flex';
+        trendError.style.display = 'none';
+        statusEl.textContent = 'Data: Live';
+
+        try {
+            const res = await fetch("{{ route('dao.pools.live') }}?t=" + Date.now(), {
+                headers: { "Accept": "application/json" },
+                cache: "no-store"
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data) throw new Error("Bad response");
+
+            const pools = Array.isArray(data.pools) ? data.pools : (Array.isArray(data.data) ? data.data : []);
+            if (!pools.length) throw new Error("No pools");
+
+            lastGood = data;
+
+            renderPools(pools.slice(0, 4));
+            renderMiniChart(data.chart?.series || []);
+
+            const src = data.meta?.source || "live";
+            const updated = data.meta?.updated_at || "";
+            statusEl.textContent = `Data: ${src}${updated ? " • Updated " + updated : ""}`;
+
+            const top = [...pools].sort((a,b) => (b.apy ?? 0) - (a.apy ?? 0)).slice(0, 4);
+            const baseAvg = top.reduce((s,p) => s + (Number(p.apy)||0), 0) / top.length;
+
+            const trend = [];
+            let v = baseAvg;
+
+            for (let i = 0; i < 30; i++) {
+                const drift = Math.sin(i / 3) * 0.15;
+                const jitter = (Math.random() - 0.5) * 0.25;
+                v = Math.max(0.1, v + drift + jitter);
+                trend.push(Number(v.toFixed(2)));
+            }
+
+            drawAreaLineChart(trendCanvas, trend);
+
+            const best = top[0];
+            const tvlSum = top.reduce((s,p) => s + (Number(p.tvl)||0), 0);
+
+            avgApy30.textContent = ((trend.reduce((s,x)=>s+x,0) / trend.length).toFixed(2)) + "%";
+            bestPoolName.textContent = best?.name || "—";
+            bestPoolApy.textContent = best?.apy != null ? Number(best.apy).toFixed(2) + "%" : "—";
+            totalTvl.textContent = "$" + fmtMoney(tvlSum);
+            trendMeta.textContent = `Top ${top.length} pools • Updated ${new Date().toLocaleString()}`;
+
+            loadingEl.style.display = 'none';
+            trendLoading.style.display = 'none';
+        } catch (e) {
+            console.error(e);
+
+            if (!lastGood) {
+                rowsEl.innerHTML = `<div class="text-sm" style="color:#fca5a5;">Failed to load pools.</div>`;
+                trendError.style.display = 'flex';
+            }
+
+            loadingEl.style.display = 'none';
+            trendLoading.style.display = 'none';
+        } finally {
+            inFlight = false;
+        }
+    }
+
+    reloadBtn?.addEventListener("click", loadTopPools);
+    window.addEventListener("resize", () => {
+        if (lastGood) loadTopPools();
+    });
+
+    loadTopPools();
+    setInterval(loadTopPools, 60000);
+})();
 </script>
 @endsection

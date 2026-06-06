@@ -130,4 +130,40 @@ class NotificationController extends Controller
 
         return redirect()->to($notification->action_url);
     }
+
+public function storeUserNotification(Request $request, \App\Models\User $user)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'notice' => 'required|string',
+        'action_page' => 'required|string',
+    ]);
+
+    $pageRoutes = [
+    'dashboard'    => 'user.dashboard',
+    'withdraw'     => 'user.withdraw.view',
+    'transactions' => 'user.transactions',
+    'schema'       => 'user.schema',
+    'referral'     => 'user.referral',
+    'ticket'       => 'user.ticket.index',
+];
+
+    $routeName = $pageRoutes[$request->action_page] ?? 'user.dashboard';
+
+    \App\Models\Notification::create([
+        'icon' => 'bell-ring',
+        'user_id' => $user->id,
+        'for' => 'user',
+        'title' => $request->title,
+        'notice' => $request->notice,
+        'action_url' => route($routeName),
+        'status' => true,
+        'read' => 0,
+        'is_popup' => true,
+    ]);
+
+    notify()->success(__('Notification sent to user.'));
+    return back();
 }
+}
+

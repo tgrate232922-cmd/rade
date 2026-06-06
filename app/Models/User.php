@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Schema;
+use App\Models\Invest;
 
 class User extends Authenticatable implements CanUseTickets, MustVerifyEmail
 {
@@ -76,9 +78,13 @@ class User extends Authenticatable implements CanUseTickets, MustVerifyEmail
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'two_fa' => 'boolean',
-    ];
+    'email_verified_at' => 'datetime',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'two_fa' => 'boolean',
+];
+    
+    
 
     public function getAvatarAttribute()
     {
@@ -257,4 +263,32 @@ class User extends Authenticatable implements CanUseTickets, MustVerifyEmail
             set: fn($value) => encrypt($value),
         );
     }
+    
+    /**
+ * Get user's favorite pool based on highest investment
+ */
+public function favoritePool()
+{
+    $favoriteInvest = $this->invests()
+        ->selectRaw('schema_id, SUM(invest_amount) as total_invested, COUNT(*) as investment_count')
+        ->groupBy('schema_id')
+        ->orderByRaw('SUM(invest_amount) DESC')
+        ->first();
+
+    if ($favoriteInvest && $favoriteInvest->schema_id) {
+        $schema = Schema::find($favoriteInvest->schema_id);
+        return $schema ? $schema->name : 'No Pool Yet';
+    }
+
+    return 'No Pool Yet';
+}
+
+/**
+ * User investments relationship
+ */
+public function invests()
+{
+    return $this->hasMany(Invest::class, 'user_id');
+}
+    
 }

@@ -5,6 +5,8 @@
 <body class="rock-dashboard-bg {{ session()->get('site-color-mode') ?? 'dark-theme' }}">
     @include('notify::components.notify')
 
+<!-- Notification JS -->
+<script src="{{ asset('assets/global/js/notifications.js') }}"></script>
     <!--[if lte IE 9]>
   <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
@@ -39,104 +41,38 @@
     <div class="rock-mobile-screen-show">
         <div class="rock-bottom-appbar">
             <ul>
-                <li @if(Route::is('user.dashboard')) class="active" @endif>
-                    <a href="{{ route('user.dashboard') }}">
-                        <span class="icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <g filter="url(#filter0_i_2565_13566)">
-                                    <g filter="url(#filter1_i_2565_13566)">
-                                        <path
-                                            d="M26.25 22.4586V12.6879C26.25 11.1742 25.5754 9.74062 24.4127 8.78315L18.1627 3.63668C16.3221 2.1211 13.6779 2.12111 11.8373 3.63668L5.58733 8.78315C4.42456 9.74062 3.75 11.1742 3.75 12.6879V22.4586C3.75 25.2429 5.98858 27.5 8.75 27.5H21.25C24.0114 27.5 26.25 25.2429 26.25 22.4586Z"
-                                            fill="url(#paint0_linear_2565_13566)" />
-                                    </g>
-                                    <path
-                                        d="M25.75 12.6879V22.4586C25.75 24.9706 23.7314 27 21.25 27H8.75C6.2686 27 4.25 24.9706 4.25 22.4586V12.6879C4.25 11.3228 4.85839 10.0311 5.90516 9.16914L12.1552 4.02267C13.8111 2.65911 16.1889 2.65911 17.8448 4.02266L24.0948 9.16914C25.1416 10.0311 25.75 11.3228 25.75 12.6879Z"
-                                        stroke="white" stroke-opacity="0.08" />
-                                    <g filter="url(#filter2_i_2565_13566)">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M9.0625 15C9.0625 14.4822 9.48223 14.0625 10 14.0625H20C20.5178 14.0625 20.9375 14.4822 20.9375 15C20.9375 15.5178 20.5178 15.9375 20 15.9375H10C9.48223 15.9375 9.0625 15.5178 9.0625 15Z"
-                                            fill="white" />
-                                    </g>
-                                    <path
-                                        d="M9.5625 15C9.5625 14.7584 9.75838 14.5625 10 14.5625H20C20.2416 14.5625 20.4375 14.7584 20.4375 15C20.4375 15.2416 20.2416 15.4375 20 15.4375H10C9.75838 15.4375 9.5625 15.2416 9.5625 15Z"
-                                        stroke="white" stroke-opacity="0.08" />
-                                    <g filter="url(#filter3_i_2565_13566)">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M9.0625 20C9.0625 19.4822 9.48223 19.0625 10 19.0625H20C20.5178 19.0625 20.9375 19.4822 20.9375 20C20.9375 20.5178 20.5178 20.9375 20 20.9375H10C9.48223 20.9375 9.0625 20.5178 9.0625 20Z"
-                                            fill="white" />
-                                    </g>
-                                    <path
-                                        d="M9.5625 20C9.5625 19.7584 9.75838 19.5625 10 19.5625H20C20.2416 19.5625 20.4375 19.7584 20.4375 20C20.4375 20.2416 20.2416 20.4375 20 20.4375H10C9.75838 20.4375 9.5625 20.2416 9.5625 20Z"
-                                        stroke="white" stroke-opacity="0.08" />
-                                </g>
-                                <defs>
-                                    <filter id="filter0_i_2565_13566" x="-0.25" y="2.5" width="26.5" height="29"
-                                        filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix"
-                                            result="shape" />
-                                        <feColorMatrix in="SourceAlpha" type="matrix"
-                                            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                                        <feOffset dx="-4" dy="4" />
-                                        <feGaussianBlur stdDeviation="5" />
-                                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-                                        <feColorMatrix type="matrix"
-                                            values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0" />
-                                        <feBlend mode="normal" in2="shape" result="effect1_innerShadow_2565_13566" />
-                                    </filter>
-                                    <filter id="filter1_i_2565_13566" x="-0.25" y="2.5" width="26.5" height="29"
-                                        filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix"
-                                            result="shape" />
-                                        <feColorMatrix in="SourceAlpha" type="matrix"
-                                            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                                        <feOffset dx="-4" dy="4" />
-                                        <feGaussianBlur stdDeviation="5" />
-                                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-                                        <feColorMatrix type="matrix"
-                                            values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0" />
-                                        <feBlend mode="normal" in2="shape" result="effect1_innerShadow_2565_13566" />
-                                    </filter>
-                                    <filter id="filter2_i_2565_13566" x="5.0625" y="14.0625" width="15.875"
-                                        height="5.875" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix"
-                                            result="shape" />
-                                        <feColorMatrix in="SourceAlpha" type="matrix"
-                                            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                                        <feOffset dx="-4" dy="4" />
-                                        <feGaussianBlur stdDeviation="5" />
-                                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-                                        <feColorMatrix type="matrix"
-                                            values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0" />
-                                        <feBlend mode="normal" in2="shape" result="effect1_innerShadow_2565_13566" />
-                                    </filter>
-                                    <filter id="filter3_i_2565_13566" x="5.0625" y="19.0625" width="15.875"
-                                        height="5.875" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix"
-                                            result="shape" />
-                                        <feColorMatrix in="SourceAlpha" type="matrix"
-                                            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                                        <feOffset dx="-4" dy="4" />
-                                        <feGaussianBlur stdDeviation="5" />
-                                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-                                        <feColorMatrix type="matrix"
-                                            values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0" />
-                                        <feBlend mode="normal" in2="shape" result="effect1_innerShadow_2565_13566" />
-                                    </filter>
-                                    <linearGradient id="paint0_linear_2565_13566" x1="3.75" y1="2.5" x2="28.6119"
-                                        y2="24.8757" gradientUnits="userSpaceOnUse">
-                                        <stop stop-color="#FDD819" />
-                                        <stop offset="1" stop-color="#F81717" />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                        </span>
-                        <span class="text">{{ __('Dashboard') }}</span>
-                    </a>
-                </li>
+          <li @if(Route::is('user.dashboard')) class="active" @endif>
+    <a href="{{ route('user.dashboard') }}">
+        <span class="icon">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <!-- main rounded square -->
+                <rect x="3" y="3" width="24" height="24" rx="8"
+                    fill="white" fill-opacity="0.06"
+                    stroke="white" stroke-opacity="0.12"/>
+
+                <!-- top stats bars -->
+                <rect x="8" y="9" width="3" height="8" rx="1.5" fill="white"/>
+                <rect x="13.5" y="6.5" width="3" height="10.5" rx="1.5" fill="white"/>
+                <rect x="19" y="11" width="3" height="6" rx="1.5" fill="white"/>
+
+                <!-- bottom line chart -->
+                <path d="M8 21L12 18L15.5 19.5L20 15.5L22 17"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+
+                <!-- dot -->
+                <circle cx="22" cy="17" r="1.4" fill="white"/>
+
+            </svg>
+        </span>
+
+        <span class="text">{{ __('Dashboard') }}</span>
+    </a>
+</li>
                 <li @if(Route::is('user.deposit.*')) class="active" @endif>
                     <a href="{{ route('user.deposit.amount') }}">
                         <span class="icon"><svg width="31" height="30" viewBox="0 0 31 30" fill="none"

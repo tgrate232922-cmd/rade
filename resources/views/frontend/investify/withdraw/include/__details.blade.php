@@ -20,15 +20,15 @@
 </li>
 
 @foreach($credentials as $name => $data)
-    <li>
-        <span class="title">{{ $name }}</span>
-        <span class="info">
-            @if( $data['type'] == 'file' )
-            <img src="{{ asset(data_get($data, 'value')) }}" alt=""/>
-            @else
-                <strong>{{ data_get($data, 'value') }}</strong>
-            @endif
-        </span>
-    </li>
+   <li>
+     <span class="title">{{ $name }}</span>
+    <span class="info" style="display:block; font-size:11px; color:#eafff4; word-break:break-all; overflow-wrap:anywhere;">
+        @if($data['type'] == 'file')
+            <img src="{{ asset(data_get($data, 'value')) }}" alt="" style="max-width:100%; height:auto; border-radius:6px;"/>
+        @else
+            {{ data_get($data, 'value') }}
+        @endif
+    </span>
+</li>
 @endforeach
 

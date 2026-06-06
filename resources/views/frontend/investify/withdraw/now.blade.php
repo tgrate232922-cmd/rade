@@ -1,16 +1,16 @@
 @extends('frontend::layouts.user')
 @section('title')
-    {{ __('Withdraw Now') }}
+    {{ __('Withdraw Funds') }}
 @endsection
 @section('content')
     {{-- <div class="row">
         <div class="col-xl-12">
             <div class="site-card">
                 <div class="site-card-header">
-                    <h3 class="title">{{ __('Withdraw Money') }}</h3>
+                    <h3 class="title">{{ __('Withdraw Funds') }}</h3>
                     <div class="card-header-links">
                         <a href="{{ route('user.withdraw.account.index') }}"
-                           class="card-header-link">{{ __('Withdraw Account') }}</a>
+                           class="card-header-link">{{ __('Wallet Address') }}</a>
                     </div>
                 </div>
                 <div class="site-card-body">
@@ -20,7 +20,7 @@
                             <div class="row">
                                 <div class="col-xl-6 col-md-12 mb-3">
                                     <label for="exampleFormControlInput1"
-                                           class="form-label">{{ __('Withdraw Account') }}</label>
+                                           class="form-label">{{ __('Wallet Address') }}</label>
                                     <div class="input-group">
                                         <select name="withdraw_account" id="withdrawAccountId" class="site-nice-select">
                                             <option selected disabled>{{ __('Withdraw Method') }}</option>
@@ -75,10 +75,10 @@
                     <div class="rock-dashboard-card">
                         <div class="rock-dashboard-title-inner">
                             <div class="content">
-                                <h3 class="rock-dashboard-tile">{{ __('Withdraw Money') }}</h3>
+                                <h3 class="rock-dashboard-tile">{{ __('Withdraw Funds') }}</h3>
                             </div>
                             <a class="site-btn gradient-btn radius-12" href="{{ route('user.withdraw.account.index') }}">
-                                {{ __('Withdraw Account') }}
+                                {{ __('Add Wallet Address') }}
                             </a>
                         </div>
                         <div class="rock-add-mony-wrapper">
@@ -87,10 +87,10 @@
                                 <div class="row gy-30">
                                     <div class="col-xxl-6 col-xl-6 col-lg-6 ">
                                         <div class="rock-single-input">
-                                            <label class="input-label" for="">{{ __('Withdraw Method') }}</label>
+                                            <label class="input-label" for="">{{ __('Select wallet') }}</label>
                                             <div class="input-select">
                                                 <select name="withdraw_account" id="withdrawAccountId">
-                                                    <option selected disabled>{{ __('Withdraw Method') }}</option>
+                                                    <option selected disabled>{{ __('Select wallet') }}</option>
                                                     @foreach($accounts as $account)
                                                         <option value="{{ $account->id }}">{{ $account->method_name }}</option>
                                                     @endforeach

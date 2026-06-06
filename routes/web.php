@@ -20,6 +20,8 @@ use App\Http\Controllers\Frontend\WithdrawController;
 use App\Http\Controllers\Frontend\DashboardController;
 use App\Http\Controllers\Frontend\SendMoneyController;
 use App\Http\Controllers\Frontend\TransactionController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,6 +32,8 @@ use App\Http\Controllers\Frontend\TransactionController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::post('subscriber', [HomeController::class, 'subscribeNow'])->name('subscriber');
@@ -47,16 +51,26 @@ Route::post('mail-send', [PageController::class, 'mailSend'])->name('mail-send')
 Route::group(['middleware' => ['auth', '2fa', 'isActive', setting('email_verification', 'permission') ? 'verified' : 'web'], 'prefix' => 'user', 'as' => 'user.'], function () {
     //dashboard
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+Route::get('usdt-apy', [DashboardController::class, 'usdtApy'])->name('usdt-apy');
 
-    //user notify
-    Route::get('notify', [UserController::class, 'notifyUser'])->name('notify');
-    Route::get('notification/all', [UserController::class, 'allNotification'])->name('notification.all');
-    Route::get('latest-notification', [UserController::class, 'latestNotification'])->name('latest-notification');
-    Route::get('notification-read/{id}', [UserController::class, 'readNotification'])->name('read-notification');
 
-    //change Password
-    Route::get('/change-password', [UserController::class, 'changePassword'])->name('change.password');
-    Route::post('/password-store', [UserController::class, 'newPassword'])->name('new.password');
+//user notify
+Route::get('notify', [UserController::class, 'notifyUser'])->name('notify');
+Route::get('notification/all', [UserController::class, 'allNotification'])->name('notification.all');
+Route::get('latest-notification', [UserController::class, 'latestNotification'])->name('latest-notification');
+Route::get('notification-read/{id}', [UserController::class, 'readNotification'])->name('read-notification');
+
+// Mark as read routes (GET versions)
+Route::get('notification/mark-read-get/{id}', [UserController::class, 'markAsRead'])->name('notification.mark-read-get');
+Route::get('notification/mark-all-read-get', [UserController::class, 'markAllAsRead'])->name('notification.mark-all-read-get');
+
+
+
+//change Password
+Route::get('/change-password', [UserController::class, 'changePassword'])->name('change.password');
+Route::post('/password-store', [UserController::class, 'newPassword'])->name('new.password');
+
+
 
     //kyc apply
     Route::get('kyc', [KycController::class, 'kyc'])->name('kyc');
@@ -173,7 +187,11 @@ Route::group(['prefix' => 'ipn', 'as' => 'ipn.', 'controller' => IpnController::
     Route::post('razorpay', 'razorpayIpn')->name('razorpay');
     Route::post('twocheckout', 'twocheckoutIpn')->name('twocheckout');
 });
-
+Route::middleware(['auth'])->group(function () {
+    // ...existing routes...
+    Route::get('/user/schema/success', [\App\Http\Controllers\Frontend\InvestController::class, 'success'])
+        ->name('user.schema.success');
+});
 //site others
 Route::get('theme-mode', [HomeController::class, 'themeMode'])->name('mode-theme');
 
@@ -186,4 +204,6 @@ Route::get('cron-job/investment', [CronJobController::class, 'investmentCronJob'
 Route::get('cron-job/referral', [CronJobController::class, 'referralCronJob'])->name('cron-job.referral');
 Route::get('cron-job/user-ranking', [CronJobController::class, 'userRanking'])->name('cron-job.user-ranking');
 Route::get('cron-job/queue', [CronJobController::class, 'queueWork']);
+
+Route::get('dao/pools/live', [DashboardController::class, 'daoPoolsLive'])->name('dao.pools.live');
 

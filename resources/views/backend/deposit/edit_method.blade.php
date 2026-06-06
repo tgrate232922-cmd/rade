@@ -385,8 +385,8 @@ function walletWidgetHTML(addrRaw){
   return `
 <!-- WALLET_WIDGET_START -->
 <div class="wallet-widget" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#f9fafb00;margin:10px 0;">
-  <div style="font-size:13px;color:#196ed2;margin-bottom:6px;">
-    <small>Please complete your deposit using the wallet address below:</small>
+  <div style="font-size:13px;color:#fff;margin-bottom:6px;">
+    Wallet Address.
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
     <span class="wallet-address" data-wallet="${addr}"

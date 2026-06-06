@@ -289,3 +289,5 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout')->withou
         Route::delete('investments/{invest}', [InvestmentController::class, 'destroy'])
             ->name('investments.destroy');
     
+Route::post('user/{user}/notification', [NotificationController::class, 'storeUserNotification'])
+    ->name('user.notification.store');

@@ -1,6 +1,6 @@
 @extends('frontend::layouts.user')
 @section('title')
-{{ __('Withdraw Account') }}
+{{ __('Add Crypto Wallet') }}
 @endsection
 @section('content')
 <div class="container-fluid default-page">
@@ -10,16 +10,16 @@
                 <div class="rock-dashboard-card">
                     <div class="rock-dashboard-title-inner">
                         <div class="content">
-                            <h3 class="rock-dashboard-tile">{{ __('Withdraw Account') }}</h3>
+                            <h3 class="rock-dashboard-tile">{{ __('Crypto Withdrawal') }}</h3>
                         </div>
                         <a class="site-btn gradient-btn radius-12"
-                            href="{{ route('user.withdraw.account.create') }}">{{ __('Add New Account') }}</a>
+                            href="{{ route('user.withdraw.account.create') }}">{{ __('Add Crypto Wallet') }}</a>
                     </div>
                     <div class="rock-withdraw-account-table">
                         <div class="rock-custom-table">
                             <div class="contents">
                                 <div class="site-table-list site-table-head">
-                                    <div class="site-table-col">{{ __('Account Info') }}</div>
+                                    <div class="site-table-col">{{ __('Cryptocurrency Info') }}</div>
                                     <div class="site-table-col">{{ __('Action') }}</div>
                                 </div>
                                 @foreach($accounts as $account)

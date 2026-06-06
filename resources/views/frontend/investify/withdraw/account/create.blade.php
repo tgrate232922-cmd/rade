@@ -1,6 +1,6 @@
 @extends('frontend::layouts.user')
 @section('title')
-    {{ __('Withdraw Account Create') }}
+    {{ __('Add Withdrawal Wallet Address') }}
 @endsection
 @section('content')
     <div class="container-fluid default-page">
@@ -10,9 +10,9 @@
                     <div class="rock-dashboard-card">
                         <div class="rock-dashboard-title-inner">
                             <div class="content">
-                                <h3 class="rock-dashboard-tile">{{ __('Add New Withdraw Account') }}</h3>
+                                <h3 class="rock-dashboard-tile">{{ __('Add Withdrawal Wallet Address') }}</h3>
                             </div>
-                            <a class="site-btn gradient-btn radius-12" href="{{ route('user.withdraw.account.index') }}">{{ __('Withdraw Account') }}</a>
+                            <a class="site-btn gradient-btn radius-12" href="{{ route('user.withdraw.account.index') }}">{{ __('Crypto Wallets') }}</a>
                         </div>
                         <div class="rock-edit-withdraw-account-form">
                             <form action="{{ route('user.withdraw.account.store') }}" method="POST" enctype="multipart/form-data">
@@ -22,13 +22,13 @@
                                         <div class="row g-20 selectMethodRow">
                                             <div class="col-xxl-6 col-xl-6 col-lg-6 selectMethodCol">
                                                 <div class="rock-single-input">
-                                                    <label class="input-label" for="selectMethod">{{ __('Choice Method') }}</label>
+                                                    <label class="input-label" for="selectMethod">{{ __('Select Withdrawal Asset') }}</label>
                                                     <div class="input-select">
                                                         <select name="withdraw_method_id" id="selectMethod">
-                                                            <option selected>{{ __('Select Method') }}</option>
+                                                            <option selected>{{ __('Select Crypto') }}</option>
                                                             @foreach($withdrawMethods as $raw)
                                                                 <option value="{{ $raw->id }}">{{ $raw->name }}
-                                                                    ({{ ucwords($raw->type) }})
+                                                                    
                                                                 </option>
                                                             @endforeach
                                                         </select>
@@ -40,7 +40,7 @@
                                     <div class="colx-xl-12">
                                         <div class="rock-input-btn-wrap justify-content-end">
                                             <button type="submit" class="site-btn gradient-btn radius-10">
-                                                {{ __('Add New Withdraw Account') }}
+                                                {{ __('Add Wallet Address') }}
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <path opacity="0.4"

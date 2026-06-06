@@ -190,12 +190,12 @@ if ($wallet !== '') {
     $paymentDetails =
         '<!-- WALLET_WIDGET_START -->' .
         '<div class="wallet-widget" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#f9fafb;margin:10px 0;">' .
-        '  <div style="font-size:13px;color:#196ed2;margin-bottom:6px;"><small>Please complete your deposit using the ' . e($assetLabel) . ' wallet address below:</small></div>' .
+        '  <div style="font-size:13px;color:#fff;margin-bottom:6px;"><small>Please complete your deposit using the wallet address below:</small></div>' .
         '  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' .
         '    <span class="wallet-address" data-wallet="' . e($wallet) . '" style="font-family:monospace;font-size:13px;word-break:break-all;">' . e($wallet) . '</span>' .
         '    <button type="button" class="copy-btn" style="background:#196ed2;color:#fff;padding:6px 10px;border:0;border-radius:4px;font-size:12px;">📋 Copy</button>' .
         '  </div>' .
-        '  <div style="font-size:12px;color:#475569;margin-top:8px;"><small>After sending, upload your payment proof in the section below.</small></div>' .
+        '  <div style="font-size:12px;color:#fff;margin-top:8px;"><small>After sending, upload your payment proof in the section below.</small></div>' .
         '</div>' .
         '<!-- WALLET_WIDGET_END -->';
 

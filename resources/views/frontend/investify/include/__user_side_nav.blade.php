@@ -10,23 +10,18 @@
             <div class="rock-sidebar-sidebar-nav">
                 <nav class="user-nav">
                     <ul>
-                        <li class="{{ isActive('user.dashboard') }}">
-                            <a href="{{ route('user.dashboard') }}">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.4"
-                                        d="M21 17.9668V10.1503C21 8.93937 20.4604 7.7925 19.5301 7.02652L14.5301 2.90935C13.0577 1.69688 10.9423 1.69689 9.46986 2.90935L4.46986 7.02652C3.53964 7.7925 3 8.93937 3 10.1503V17.9668C3 20.1943 4.79086 22 7 22H17C19.2091 22 21 20.1943 21 17.9668Z"
-                                        fill="white" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M7.25 12C7.25 11.5858 7.58579 11.25 8 11.25H16C16.4142 11.25 16.75 11.5858 16.75 12C16.75 12.4142 16.4142 12.75 16 12.75H8C7.58579 12.75 7.25 12.4142 7.25 12Z"
-                                        fill="white" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M7.25 16C7.25 15.5858 7.58579 15.25 8 15.25H16C16.4142 15.25 16.75 15.5858 16.75 16C16.75 16.4142 16.4142 16.75 16 16.75H8C7.58579 16.75 7.25 16.4142 7.25 16Z"
-                                        fill="white" />
-                                </svg>
-                                <span>{{ __('Dashboard') }}</span>
-                            </a>
-                        </li>
+                <li class="{{ isActive('user.dashboard') }}">
+    <a href="{{ route('user.dashboard') }}">
+       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="7" height="7" rx="2" fill="currentColor"/>
+            <rect x="14" y="3" width="7" height="7" rx="2" fill="currentColor"/>
+            <rect x="14" y="14" width="7" height="7" rx="2" fill="currentColor"/>
+            <rect x="3" y="14" width="7" height="7" rx="2" fill="currentColor"/>
+        </svg>
+        <span>{{ __('Dashboard') }}</span>
+    </a>
+</li>
                         <li class="{{ isActive('user.schema*') }}">
                             <a href="{{ route('user.schema') }}">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -41,7 +36,7 @@
                                         d="M11.1718 11.6237L3.00221 7.91023C2.22062 7.55496 2.22062 6.44476 3.00221 6.08949L11.1718 2.37604C11.6976 2.13702 12.3012 2.13702 12.827 2.37604L20.9966 6.08949C21.7782 6.44476 21.7782 7.55496 20.9966 7.91023L12.827 11.6237C12.3012 11.8627 11.6976 11.8627 11.1718 11.6237Z"
                                         fill="white" />
                                 </svg>
-                                <span>{{ __('Yields') }}</span>
+                                <span>{{ __('Staking') }}</span>
                             </a>
                         </li>
                         <li class="{{ isActive('user.invest*') }}">
@@ -55,7 +50,43 @@
                                         d="M10.2285 9.75C8.51683 9.75 6.96574 10.7973 6.27058 12.4224L2.92188 19.9806C3.51188 20.6095 4.33613 21 5.24816 21H14.7066C16.228 21 17.6378 20.1707 18.4206 18.8152L21.6878 13.1576C22.5539 11.6579 21.5141 9.75 19.8308 9.75H10.2285Z"
                                         fill="white" />
                                 </svg>
-                                <span>{{ __('Yield Tracker') }}</span>
+                                <span>{{ __('Active Pool') }}</span>
+                            </a>
+                        </li>
+                        
+                        <li class="@if( Route::currentRouteName() != 'user.deposit.log') {{ isActive('user.deposit*') }} @endif">
+                            <a href="{{ route('user.deposit.amount') }}">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4"
+                                        d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                                        fill="white" />
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M12 5.75C12.4142 5.75 12.75 6.08579 12.75 6.5V7.35352C13.9043 7.67998 14.75 8.74122 14.75 10C14.75 10.4142 14.4142 10.75 14 10.75C13.5858 10.75 13.25 10.4142 13.25 10C13.25 9.30964 12.6904 8.75 12 8.75C11.3096 8.75 10.75 9.30964 10.75 10C10.75 10.6904 11.3096 11.25 12 11.25C13.5188 11.25 14.75 12.4812 14.75 14C14.75 15.2588 13.9043 16.32 12.75 16.6465V17.5C12.75 17.9142 12.4142 18.25 12 18.25C11.5858 18.25 11.25 17.9142 11.25 17.5V16.6465C10.0957 16.32 9.25 15.2588 9.25 14C9.25 13.5858 9.58579 13.25 10 13.25C10.4142 13.25 10.75 13.5858 10.75 14C10.75 14.6904 11.3096 15.25 12 15.25C12.6904 15.25 13.25 14.6904 13.25 14C13.25 13.3096 12.6904 12.75 12 12.75C10.4812 12.75 9.25 11.5188 9.25 10C9.25 8.74122 10.0957 7.67998 11.25 7.35352V6.5C11.25 6.08579 11.5858 5.75 12 5.75Z"
+                                        fill="white" />
+                                </svg>
+                                <span>{{ __('Deposit') }}</span>
+                            </a>
+                        </li>
+                        
+                          <li class="@if( Route::currentRouteName() != 'user.withdraw.log') {{ isActive('user.withdraw*') }} @endif">
+                            <a href="{{ route('user.withdraw.view') }}">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path opacity="0.4"
+                                        d="M4 12C4 10.8954 4.89543 10 6 10H15C16.1046 10 17 10.8954 17 12C17 13.1046 16.1046 14 15 14H6C4.89543 14 4 13.1046 4 12Z"
+                                        fill="white" />
+                                    <path
+                                        d="M15 14H6.16667C4.97005 14 4 14.8954 4 16C4 17.1046 4.97005 18 6.16667 18H15C16.1046 18 17 17.1046 17 16C17 14.8954 16.1046 14 15 14Z"
+                                        fill="white" />
+                                    <path opacity="0.4"
+                                        d="M20 18C20 15.7909 18.2091 14 16 14C15.8007 14 15.6047 14.0146 15.4132 14.0427C13.4823 14.3266 12 15.9902 12 18C12 20.2091 13.7909 22 16 22C18.2091 22 20 20.2091 20 18Z"
+                                        fill="white" />
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M11.25 3.39645L10.5303 4.11612C10.2374 4.40901 9.76256 4.40901 9.46967 4.11612C9.17678 3.82322 9.17678 3.34835 9.46967 3.05546L10.7626 1.76256C11.446 1.07915 12.554 1.07914 13.2374 1.76256L14.5303 3.05546C14.8232 3.34835 14.8232 3.82322 14.5303 4.11612C14.2374 4.40901 13.7626 4.40901 13.4697 4.11612L12.75 3.39645L12.75 7C12.75 7.41421 12.4142 7.75 12 7.75C11.5858 7.75 11.25 7.41421 11.25 7L11.25 3.39645Z"
+                                        fill="white" />
+                                </svg>
+                                <span>{{ __('Withdraw') }}</span>
                             </a>
                         </li>
                         <li class="{{ isActive('user.transactions*') }}">
@@ -77,33 +108,20 @@
                                 </svg>
                                 <span>{{ __('Asset History') }}</span></a>
                         </li>
-                        <li class="@if( Route::currentRouteName() != 'user.deposit.log') {{ isActive('user.deposit*') }} @endif">
-                            <a href="{{ route('user.deposit.amount') }}">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.4"
-                                        d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
-                                        fill="white" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M12 5.75C12.4142 5.75 12.75 6.08579 12.75 6.5V7.35352C13.9043 7.67998 14.75 8.74122 14.75 10C14.75 10.4142 14.4142 10.75 14 10.75C13.5858 10.75 13.25 10.4142 13.25 10C13.25 9.30964 12.6904 8.75 12 8.75C11.3096 8.75 10.75 9.30964 10.75 10C10.75 10.6904 11.3096 11.25 12 11.25C13.5188 11.25 14.75 12.4812 14.75 14C14.75 15.2588 13.9043 16.32 12.75 16.6465V17.5C12.75 17.9142 12.4142 18.25 12 18.25C11.5858 18.25 11.25 17.9142 11.25 17.5V16.6465C10.0957 16.32 9.25 15.2588 9.25 14C9.25 13.5858 9.58579 13.25 10 13.25C10.4142 13.25 10.75 13.5858 10.75 14C10.75 14.6904 11.3096 15.25 12 15.25C12.6904 15.25 13.25 14.6904 13.25 14C13.25 13.3096 12.6904 12.75 12 12.75C10.4812 12.75 9.25 11.5188 9.25 10C9.25 8.74122 10.0957 7.67998 11.25 7.35352V6.5C11.25 6.08579 11.5858 5.75 12 5.75Z"
-                                        fill="white" />
-                                </svg>
-                                <span>{{ __('Deposit') }}</span>
-                            </a>
-                        </li>
-                        <li class="{{ isActive('user.deposit.log') }}">
-                            <a href="{{ route('user.deposit.log') }}">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.4"
-                                        d="M20 13C20 17.9706 15.9706 22 11 22C6.02944 22 2 17.9706 2 13C2 8.02944 6.02944 4 11 4C15.9706 4 20 8.02944 20 13Z"
-                                        fill="white" />
-                                    <path
-                                        d="M21.8025 10.0128C21.0104 6.08419 17.9158 2.98956 13.9872 2.19745C12.9045 1.97914 12 2.89543 12 4V10C12 11.1046 12.8954 12 14 12H20C21.1046 12 22.0209 11.0955 21.8025 10.0128Z"
-                                        fill="white" />
-                                </svg>
-                                <span>{{ __('Deposit History') }}</span></a>
-                        </li>
+                        
+                        <!--<li class="{{ isActive('user.deposit.log') }}">-->
+                        <!--    <a href="{{ route('user.deposit.log') }}">-->
+                        <!--        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"-->
+                        <!--            xmlns="http://www.w3.org/2000/svg">-->
+                        <!--            <path opacity="0.4"-->
+                        <!--                d="M20 13C20 17.9706 15.9706 22 11 22C6.02944 22 2 17.9706 2 13C2 8.02944 6.02944 4 11 4C15.9706 4 20 8.02944 20 13Z"-->
+                        <!--                fill="white" />-->
+                        <!--            <path-->
+                        <!--                d="M21.8025 10.0128C21.0104 6.08419 17.9158 2.98956 13.9872 2.19745C12.9045 1.97914 12 2.89543 12 4V10C12 11.1046 12.8954 12 14 12H20C21.1046 12 22.0209 11.0955 21.8025 10.0128Z"-->
+                        <!--                fill="white" />-->
+                        <!--        </svg>-->
+                        <!--        <span>{{ __('Deposit History') }}</span></a>-->
+                        <!--</li>-->
                         <li class="{{ isActive('user.wallet-exchange') }}">
                             <a href="{{ route('user.wallet-exchange') }}">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -120,43 +138,24 @@
                         </li>
                        
                         
-                        <li class="@if( Route::currentRouteName() != 'user.withdraw.log') {{ isActive('user.withdraw*') }} @endif">
-                            <a href="{{ route('user.withdraw.view') }}">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.4"
-                                        d="M4 12C4 10.8954 4.89543 10 6 10H15C16.1046 10 17 10.8954 17 12C17 13.1046 16.1046 14 15 14H6C4.89543 14 4 13.1046 4 12Z"
-                                        fill="white" />
-                                    <path
-                                        d="M15 14H6.16667C4.97005 14 4 14.8954 4 16C4 17.1046 4.97005 18 6.16667 18H15C16.1046 18 17 17.1046 17 16C17 14.8954 16.1046 14 15 14Z"
-                                        fill="white" />
-                                    <path opacity="0.4"
-                                        d="M20 18C20 15.7909 18.2091 14 16 14C15.8007 14 15.6047 14.0146 15.4132 14.0427C13.4823 14.3266 12 15.9902 12 18C12 20.2091 13.7909 22 16 22C18.2091 22 20 20.2091 20 18Z"
-                                        fill="white" />
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M11.25 3.39645L10.5303 4.11612C10.2374 4.40901 9.76256 4.40901 9.46967 4.11612C9.17678 3.82322 9.17678 3.34835 9.46967 3.05546L10.7626 1.76256C11.446 1.07915 12.554 1.07914 13.2374 1.76256L14.5303 3.05546C14.8232 3.34835 14.8232 3.82322 14.5303 4.11612C14.2374 4.40901 13.7626 4.40901 13.4697 4.11612L12.75 3.39645L12.75 7C12.75 7.41421 12.4142 7.75 12 7.75C11.5858 7.75 11.25 7.41421 11.25 7L11.25 3.39645Z"
-                                        fill="white" />
-                                </svg>
-                                <span>{{ __('Withdraw') }}</span>
-                            </a>
-                        </li>
-                        <li class="{{ isActive('user.withdraw.log') }}">
-                            <a href="{{ route('user.withdraw.log') }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path opacity="0.4"
-                                        d="M18 4C19.1046 4 20 4.89543 20 6C20 7.10457 19.1046 8 18 8L10 8C8.89543 8 8 7.10457 8 6C8 4.89543 8.89543 4 10 4L18 4Z"
-                                        fill="white" />
-                                    <path opacity="0.4"
-                                        d="M18 12C19.1046 12 20 12.8954 20 14C20 15.1046 19.1046 16 18 16L10 16C8.89543 16 8 15.1046 8 14C8 12.8954 8.89543 12 10 12L18 12Z"
-                                        fill="white" />
-                                    <rect x="16" y="8" width="4" height="12" rx="2" transform="rotate(90 16 8)"
-                                        fill="white" />
-                                    <rect x="17" y="16" width="4" height="12" rx="2" transform="rotate(90 17 16)"
-                                        fill="white" />
-                                </svg>
-                                <span>{{ __('Withdraw History') }}</span>
-                            </a>
-                        </li>
+                      
+                        <!--<li class="{{ isActive('user.withdraw.log') }}">-->
+                        <!--    <a href="{{ route('user.withdraw.log') }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"-->
+                        <!--            xmlns="http://www.w3.org/2000/svg">-->
+                        <!--            <path opacity="0.4"-->
+                        <!--                d="M18 4C19.1046 4 20 4.89543 20 6C20 7.10457 19.1046 8 18 8L10 8C8.89543 8 8 7.10457 8 6C8 4.89543 8.89543 4 10 4L18 4Z"-->
+                        <!--                fill="white" />-->
+                        <!--            <path opacity="0.4"-->
+                        <!--                d="M18 12C19.1046 12 20 12.8954 20 14C20 15.1046 19.1046 16 18 16L10 16C8.89543 16 8 15.1046 8 14C8 12.8954 8.89543 12 10 12L18 12Z"-->
+                        <!--                fill="white" />-->
+                        <!--            <rect x="16" y="8" width="4" height="12" rx="2" transform="rotate(90 16 8)"-->
+                        <!--                fill="white" />-->
+                        <!--            <rect x="17" y="16" width="4" height="12" rx="2" transform="rotate(90 17 16)"-->
+                        <!--                fill="white" />-->
+                        <!--        </svg>-->
+                        <!--        <span>{{ __('Withdraw History') }}</span>-->
+                        <!--    </a>-->
+                        <!--</li>-->
                        
                         <li class=" {{ isActive('user.referral') }}">
                             <a href="{{ route('user.referral') }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -246,10 +245,11 @@
         </div>
     </div>
     
- <!-- Smartsupp Live Chat script -->
+
+<!-- Smartsupp Live Chat script -->
 <script type="text/javascript">
 var _smartsupp = _smartsupp || {};
-_smartsupp.key = '3da80071c228269b295965d352e44e4e657f9837';
+_smartsupp.key = '7c859caa0b39ea9f212eb8e702dc7ef6b30fd4f7';
 _smartsupp.offsetX = 10; // move along the X axis by 100 pixels
 _smartsupp.offsetY = 100; // move along the Y axis by 100 pixels
 window.smartsupp||(function(d) {
@@ -259,8 +259,7 @@ window.smartsupp||(function(d) {
   c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
 })(document);
 </script>
-<noscript> Powered by <a href=“https://www.smartsupp.com” target=“_blank”>MinxChain</a></noscript>
-
+<noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
 
 
 </div>

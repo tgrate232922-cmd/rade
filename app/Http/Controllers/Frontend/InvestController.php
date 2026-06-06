@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\InvestStatus;
 use App\Enums\TxnStatus;
 use App\Enums\TxnType;
+use App\Http\Controllers\Frontend\GatewayController;
 use App\Models\DepositMethod;
 use App\Models\Invest;
 use App\Models\LevelReferral;
@@ -24,7 +25,6 @@ class InvestController extends GatewayController
 
     public function investNow(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'schema_id' => 'required',
             'invest_amount' => 'regex:/^[0-9]+(\.[0-9][0-9]?)?$/',
@@ -33,38 +33,34 @@ class InvestController extends GatewayController
 
         if ($validator->fails()) {
             notify()->error($validator->errors()->first(), 'Error');
-
             return redirect()->back();
         }
 
         $input = $request->all();
-
         $user = Auth::user();
         $schema = Schema::with('schedule')->find($input['schema_id']);
-
         $investAmount = $input['invest_amount'];
 
-        //Insufficient Balance validation
+        // Insufficient Balance validation
         if ($input['wallet'] == 'main' && $user->balance < $investAmount) {
             notify()->error('Insufficient Balance Your Main Wallet', 'Error');
-
             return redirect()->route('user.schema.preview', $schema->id);
         } elseif ($input['wallet'] == 'profit' && $user->profit_balance < $investAmount) {
             notify()->error('Insufficient Balance Your Profit Wallet', 'Error');
-
             return redirect()->route('user.schema.preview', $schema->id);
         }
 
-        //invalid Amount
-        if (($schema->type == 'range' && ($schema->min_amount > $investAmount || $schema->max_amount < $investAmount)) || ($schema->type == 'fixed' && $schema->fixed_amount != $investAmount)) {
-            notify()->error('Invest Amount Out Of Range', 'Error');
-
+        // invalid Amount
+        if (
+            ($schema->type == 'range' && ($schema->min_amount > $investAmount || $schema->max_amount < $investAmount)) ||
+            ($schema->type == 'fixed' && $schema->fixed_amount != $investAmount)
+        ) {
+            notify()->error('Stake Amount Out Of Range', 'Error');
             return redirect()->route('user.schema.preview', $schema->id);
         }
 
         $periodHours = $schema->schedule->time;
         $nextProfitTime = Carbon::now()->addHour($periodHours);
-        $siteName = setting('site_title', 'global');
         $data = [
             'user_id' => $user->id,
             'schema_id' => $schema->id,
@@ -82,15 +78,16 @@ class InvestController extends GatewayController
 
         if ($input['wallet'] == 'main') {
             $user->decrement('balance', $input['invest_amount']);
-
         } elseif ($input['wallet'] == 'profit') {
             $user->decrement('profit_balance', $input['invest_amount']);
         } else {
-
+            // Gateway flow
             $gatewayInfo = DepositMethod::code($input['gateway_code'])->first();
 
-            $charge = $gatewayInfo->charge_type == 'percentage' ? (($gatewayInfo->charge / 100) * $investAmount) : $gatewayInfo->charge;
-            $finalAmount = (float)$investAmount + (float)$charge;
+            $charge = $gatewayInfo->charge_type == 'percentage'
+                ? (($gatewayInfo->charge / 100) * $investAmount)
+                : $gatewayInfo->charge;
+            $finalAmount = (float) $investAmount + (float) $charge;
             $payAmount = $finalAmount * $gatewayInfo->rate;
             $payCurrency = $gatewayInfo->currency;
 
@@ -98,23 +95,47 @@ class InvestController extends GatewayController
             if (isset($input['manual_data'])) {
                 $manualData = $input['manual_data'];
                 foreach ($manualData as $key => $value) {
-
                     if (is_file($value)) {
                         $manualData[$key] = self::imageUploadTrait($value);
                     }
                 }
-
             }
 
-            $txnInfo = Txn::new($investAmount, $charge, $finalAmount, $gatewayInfo->name, $schema->name . ' Invested', TxnType::Investment, TxnStatus::Pending, $payCurrency, $payAmount, $user->id, null, 'user', $manualData ?? []);
+            $txnInfo = Txn::new(
+                $investAmount,
+                $charge,
+                $finalAmount,
+                $gatewayInfo->name,
+                $schema->name . ' Invested',
+                TxnType::Investment,
+                TxnStatus::Pending,
+                $payCurrency,
+                $payAmount,
+                $user->id,
+                null,
+                'user',
+                $manualData ?? []
+            );
+
             $data = array_merge($data, ['status' => InvestStatus::Pending, 'transaction_id' => $txnInfo->id]);
             Invest::create($data);
 
             return self::depositAutoGateway($input['gateway_code'], $txnInfo);
-
         }
 
-        $tnxInfo = Txn::new($input['invest_amount'], 0, $input['invest_amount'], 'system', $schema->name . ' Plan Invested', TxnType::Investment, TxnStatus::Success, null, null, $user->id);
+        // Main/profit flow: create txn, invest, notify, redirect to success page
+        $tnxInfo = Txn::new(
+            $input['invest_amount'],
+            0,
+            $input['invest_amount'],
+            'system',
+            $schema->name . ' Plan Invested',
+            TxnType::Investment,
+            TxnStatus::Success,
+            null,
+            null,
+            $user->id
+        );
         $data = array_merge($data, ['transaction_id' => $tnxInfo->id]);
         Invest::create($data);
 
@@ -136,9 +157,33 @@ class InvestController extends GatewayController
         $this->pushNotify('user_investment', $shortcodes, route('user.invest-logs'), $tnxInfo->user->id);
         $this->smsNotify('user_investment', $shortcodes, $tnxInfo->user->phone);
 
-        notify()->success('Successfully Investment', 'success');
+        notify()->success('Stake position placed successfully', 'success');
 
-        return redirect()->route('user.invest-logs');
+        // Redirect to success page with session data
+        return redirect()->route('user.schema.success')->with([
+            'schema_id' => $schema->id,
+            'amount'    => $input['invest_amount'],
+            'txid'      => $tnxInfo->tnx,
+        ]);
+    }
+
+    /**
+     * Stake success page
+     */
+    public function success()
+    {
+        $schemaId = session('schema_id');
+        $amount   = session('amount');
+        $txid     = session('txid');
+
+        if (!$schemaId || !$amount) {
+            return redirect()->route('user.invest-logs');
+        }
+
+        $schema   = Schema::with('schedule')->find($schemaId);
+        $currency = setting('site_currency', 'global');
+
+        return view('frontend.investify.schema.success', compact('schema', 'amount', 'txid', 'currency'));
     }
 
     public function investLogs(Request $request)
@@ -146,7 +191,7 @@ class InvestController extends GatewayController
         $data = Invest::with('schema')->where('user_id', auth()->id())->latest();
 
         if ($request->ajax()) {
-            return Datatables::of($data)
+            return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('icon', 'frontend::user.include.__invest_icon')
                 ->addColumn('schema', 'frontend::user.include.__invest_schema')
@@ -157,7 +202,7 @@ class InvestController extends GatewayController
                         return 'Unlimited';
                     }
 
-                    return $raw->number_of_period . ($raw->number_of_period < 2 ? ' Time' : ' Times');
+                    return $raw->number_of_period . ($raw->number_of_period < 2 ? ' Day' : ' Days');
                 })
                 ->editColumn('capital_back', 'frontend::user.include.__invest_capital_back')
                 ->editColumn('next_profit_time', 'frontend::user.include.__invest_next_profit_time')
@@ -165,19 +210,21 @@ class InvestController extends GatewayController
                 ->make(true);
         }
 
-        return view('frontend::user.invest.log',compact('data'));
+        return view('frontend::user.invest.log', compact('data'));
     }
 
     public function investCancel($id)
     {
         $investment = Invest::find($id);
 
-        //daily limit
-        $todayTransaction = Invest::where('user_id', auth()->user()->id)->where('status', InvestStatus::Canceled)->whereDate('created_at', Carbon::today())->count();
-        $dayLimit = (float)Setting('send_money_day_limit', 'fee');
+        // daily limit
+        $todayTransaction = Invest::where('user_id', auth()->user()->id)
+            ->where('status', InvestStatus::Canceled)
+            ->whereDate('created_at', Carbon::today())
+            ->count();
+        $dayLimit = (float) Setting('send_money_day_limit', 'fee');
         if ($todayTransaction >= $dayLimit) {
             notify()->error(__('Today Investment Cancel limit has been reached'), 'Error');
-
             return redirect()->back();
         }
 
@@ -191,11 +238,23 @@ class InvestController extends GatewayController
             $user->balance += $investment->invest_amount;
             $user->save();
 
-            Txn::new($investment->invest_amount, 0, $investment->invest_amount, 'system', $investment->schema->name . ' ' . 'Money Refund in Main Wallet from System', TxnType::Refund, TxnStatus::Success, null, null, $user->id);
+            Txn::new(
+                $investment->invest_amount,
+                0,
+                $investment->invest_amount,
+                'system',
+                $investment->schema->name . ' ' . 'Money Refund in Main Wallet from System',
+                TxnType::Refund,
+                TxnStatus::Success,
+                null,
+                null,
+                $user->id
+            );
             notify()->success('Cancel Investment Successfully', 'success');
 
             return redirect()->route('user.invest-logs');
         }
+
         abort_if(!$investment->schema->schema_cancel, 403, 'Can Not Be Cancel Investment');
         notify()->warning('Can Not Be Cancel Investment', 'warning');
 

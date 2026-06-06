@@ -171,9 +171,8 @@ class UserController extends Controller
         return view('frontend::user.notification.index', compact('notifications'));
     }
 
-    public function readNotification($id)
+       public function readNotification($id)
     {
-
         if ($id == 0) {
             Notification::where('for', 'user')->where('user_id', auth()->user()->id)->update(['read' => 1]);
 
@@ -187,4 +186,74 @@ class UserController extends Controller
 
         return redirect()->to($notification->action_url);
     }
+
+
+
+
+    // Make sure the method above is CLOSED with }
+    
+   public function markAsRead($id)
+{
+    try {
+        $notification = Notification::where('for', 'user')
+            ->where('user_id', auth()->id())
+            ->find($id);
+        
+        if (!$notification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found'
+            ], 404);
+        }
+        
+        if ($notification->read == 0) {
+            $notification->read = 1;
+            $notification->save();
+        }
+        
+        $unreadCount = Notification::where('for', 'user')
+            ->where('user_id', auth()->id())
+            ->where('read', 0)
+            ->count();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification marked as read',
+            'unread_count' => $unreadCount
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Mark as read error: ' . $e->getMessage());
+        
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
 }
+
+  public function markAllAsRead()
+{
+    try {
+        $updated = Notification::where('for', 'user')
+            ->where('user_id', auth()->id())
+            ->where('read', 0)
+            ->update(['read' => 1]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'All notifications marked as read',
+            'unread_count' => 0,
+            'updated' => $updated
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Mark all error: ' . $e->getMessage());
+        
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+}  // Make sure the CLASS is closed with }

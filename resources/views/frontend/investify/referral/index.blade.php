@@ -148,7 +148,7 @@
                                                                 <span class="white-text">{{ $raw->tnx }}</span>
                                                             </div>
                                                             <div class="site-table-col">
-                                                                <span class="pinkDiamond-text">{{ ucfirst($raw->type) }}</span>
+                                                               <span class="pinkDiamond-text">{{ ucfirst($raw->type->value) }}</span>
                                                             </div>
                                                             <div class="site-table-col">
                                                                 <span class="success-text">+{{$raw->amount .' '.$currency}}
@@ -221,7 +221,7 @@
                                                                 <span class="white-text">{{ $raw->tnx }}</span>
                                                             </div>
                                                             <div class="site-table-col">
-                                                                <span class="pinkDiamond-text">{{ ucfirst($raw->type) }}</span>
+                                                               <span class="pinkDiamond-text">{{ ucfirst($raw->type->value) }}</span>
                                                             </div>
                                                             <div class="site-table-col">
                                                                 <span class="success-text">+{{$raw->amount .' '.$currency}}

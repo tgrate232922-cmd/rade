@@ -4,21 +4,16 @@
 <!-- Show desktop-screen content -->
 <div class="rock-desktop-screen-show">
 <div class="content-inner">
-<button class="toggle-sidebar">
-<span class="bar-icon">
-<svg width="28" height="28" viewBox="0 0 28 28" fill="none"
-xmlns="http://www.w3.org/2000/svg">
-<path opacity="0.4"
-    d="M27.3327 13.9998C27.3327 21.3636 21.3631 27.3332 13.9993 27.3332C6.63555 27.3332 0.666016 21.3636 0.666016 13.9998C0.666016 6.63604 6.63555 0.666504 13.9993 0.666504C21.3631 0.666504 27.3327 6.63604 27.3327 13.9998Z"
-    fill="white" />
-<path fill-rule="evenodd" clip-rule="evenodd"
-    d="M18.6 7.86656C19.0418 8.19793 19.1314 8.82473 18.8 9.26656L16 12.9999C15.5556 13.5925 15.5556 14.4073 16 14.9999L18.8 18.7332C19.1314 19.1751 19.0418 19.8019 18.6 20.1332C18.1582 20.4646 17.5314 20.3751 17.2 19.9332L14.4 16.1999C13.4222 14.8962 13.4222 13.1036 14.4 11.7999L17.2 8.06656C17.5314 7.62473 18.1582 7.53519 18.6 7.86656Z"
-    fill="white" />
-<path fill-rule="evenodd" clip-rule="evenodd"
-    d="M11.9333 7.86656C12.3752 8.19793 12.4647 8.82473 12.1333 9.26656L9.33333 12.9999C8.88889 13.5925 8.88889 14.4073 9.33333 14.9999L12.1333 18.7332C12.4647 19.1751 12.3752 19.8019 11.9333 20.1332C11.4915 20.4646 10.8647 20.3751 10.5333 19.9332L7.73333 16.1999C6.75556 14.8962 6.75556 13.1036 7.73333 11.7999L10.5333 8.06656C10.8647 7.62473 11.4915 7.53519 11.9333 7.86656Z"
-    fill="white" />
-</svg>
-</span>
+<button class="toggle-sidebar" aria-label="Toggle sidebar">
+    <span class="bar-icon">
+        <!-- Hamburger Menu Icon SVG -->
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <rect y="5" width="28" height="3.5" rx="1.5" fill="currentColor"/>
+            <rect y="12.25" width="28" height="3.5" rx="1.5" fill="currentColor"/>
+            <rect y="19.5" width="28" height="3.5" rx="1.5" fill="currentColor"/>
+        </svg>
+    </span>
 </button>
 <div class="current-status">
 <h4 class="title">@yield('title')</h4>
@@ -37,80 +32,112 @@ xmlns="http://www.w3.org/2000/svg">
 @php
 $userId = auth()->id();
 $notifications = App\Models\Notification::where('for','user')->where('user_id',$userId)->latest()->take(10)->get();
-$totalCount = App\Models\Notification::where('for','user')->where('user_id', $userId)->count();
+$totalCount = App\Models\Notification::where('for','user')->where('user_id', $userId)->where('read', 0)->count();
 @endphp
 <div class="header-right-content">
 <div class="user-action">
 <ul>
 <li>
-<div class="notifications-box">
-<div class="dropdown">
-<button class="notifications-drop-btn dropdown-toggle" type="button">
-    <svg width="16" height="18" viewBox="0 0 16 18" fill="none"
-        xmlns="http://www.w3.org/2000/svg">
-        <path
-            d="M8 18C9.38503 18 10.5633 17.1652 11 16H5C5.43668 17.1652 6.61497 18 8 18Z"
-            fill="white" />
-        <path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd"
-            d="M9.6896 0.754028C9.27403 0.291157 8.67102 0 8 0C6.74634 0 5.73005 1.01629 5.73005 2.26995V2.37366C3.58766 3.10719 2.0016 4.85063 1.76046 6.97519L1.31328 10.9153C1.23274 11.6249 0.933441 12.3016 0.447786 12.8721C-0.649243 14.1609 0.394434 16 2.22281 16H13.7772C15.6056 16 16.6492 14.1609 15.5522 12.8721C15.0666 12.3016 14.7673 11.6249 14.6867 10.9153L14.2395 6.97519C14.2333 6.92024 14.2262 6.86556 14.2181 6.81113C13.8341 6.93379 13.4248 7 13 7C10.7909 7 9 5.20914 9 3C9 2.16744 9.25436 1.3943 9.6896 0.754028Z"
-            fill="white" />
-        <circle cx="13" cy="3" r="3" fill="white" />
+    <div class="notifications-box">
+        <div class="dropdown">
+            <button class="notifications-drop-btn dropdown-toggle {{ $totalCount > 0 ? 'has-notification' : '' }}" type="button">
+                <svg width="16" height="18" viewBox="0 0 16 18" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M8 18C9.38503 18 10.5633 17.1652 11 16H5C5.43668 17.1652 6.61497 18 8 18Z"
+                        fill="url(#notifGradient1)" />
+                    <path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd"
+                        d="M9.6896 0.754028C9.27403 0.291157 8.67102 0 8 0C6.74634 0 5.73005 1.01629 5.73005 2.26995V2.37366C3.58766 3.10719 2.0016 4.85063 1.76046 6.97519L1.31328 10.9153C1.23274 11.6249 0.933441 12.3016 0.447786 12.8721C-0.649243 14.1609 0.394434 16 2.22281 16H13.7772C15.6056 16 16.6492 14.1609 15.5522 12.8721C15.0666 12.3016 14.7673 11.6249 14.6867 10.9153L14.2395 6.97519C14.2333 6.92024 14.2262 6.86556 14.2181 6.81113C13.8341 6.93379 13.4248 7 13 7C10.7909 7 9 5.20914 9 3C9 2.16744 9.25436 1.3943 9.6896 0.754028Z"
+                        fill="url(#notifGradient2)" />
+                    @if($totalCount > 0)
+                    <circle cx="13" cy="3" r="3" fill="#e3ef26" />
+                    @endif
+                    <defs>
+                        <linearGradient id="notifGradient1" x1="5" y1="16" x2="11" y2="18" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                        <linearGradient id="notifGradient2" x1="0.447786" y1="0" x2="15.5522" y2="16" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7" stop-opacity="0.7"/>
+                            <stop offset="1" stop-color="#1870f4" stop-opacity="0.7"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                @if($totalCount > 0)
+                <span class="notification-badge" id="notificationCount">{{ $totalCount > 9 ? '9+' : $totalCount }}</span>
+                @endif
+            </button>
+            <div class="dropdown-menu">
+                <div class="notifications-top-content">
+                    <h4 class="title">{{ __('Notifications') }}</h4>
+                   @if($totalCount > 0)
+<a href="{{ route('user.read-notification', 0) }}" class="mark-all-read-btn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-</button>
-<div class="dropdown-menu">
-    <div class="notifications-top-content">
-        <h4 class="title">{{ __('Notifications') }}</h4>
-    </div>
-    <div class="notifications-info-wrapper">
-        <div class="notifications-info-list">
-            <ul>
-                @forelse ($notifications as $notification)
-                <li>
-                    <a class="list-item"
-                        href="{{ route($notification->for.'.read-notification', $notification->id) }}">
-                        <div class="icon">
-                            <svg width="16" height="18" viewBox="0 0 16 18"
-                                fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M8 18C9.38503 18 10.5633 17.1652 11 16H5C5.43668 17.1652 6.61497 18 8 18Z"
-                                    fill="white" />
-                                <path opacity="0.4" fill-rule="evenodd"
-                                    clip-rule="evenodd"
-                                    d="M9.6896 0.754028C9.27403 0.291157 8.67102 0 8 0C6.74634 0 5.73005 1.01629 5.73005 2.26995V2.37366C3.58766 3.10719 2.0016 4.85063 1.76046 6.97519L1.31328 10.9153C1.23274 11.6249 0.933441 12.3016 0.447786 12.8721C-0.649243 14.1609 0.394434 16 2.22281 16H13.7772C15.6056 16 16.6492 14.1609 15.5522 12.8721C15.0666 12.3016 14.7673 11.6249 14.6867 10.9153L14.2395 6.97519C14.2333 6.92024 14.2262 6.86556 14.2181 6.81113C13.8341 6.93379 13.4248 7 13 7C10.7909 7 9 5.20914 9 3C9 2.16744 9.25436 1.3943 9.6896 0.754028Z"
-                                    fill="white" />
-                                <circle cx="13" cy="3" r="3" fill="white" />
-                            </svg>
-                        </div>
-                        <div class="content">
-                            <h5 class="title">
-                                {{ $notification->notice }}
-                            </h5>
-                            <span
-                                class="info">{{ $notification->created_at->diffForHumans() }}</span>
-                        </div>
-                    </a>
-                </li>
-                @empty
-                <li>
-                    <a href="#" class="list-item text-center">
-                        <div class="content">
-                            <h5 class="title">{{ __('No Notification Found!') }}</h5>
-                        </div>
-                    </a>
-                </li>
-                @endforelse
-            </ul>
+    {{ __('Mark All Read') }}
+</a>
+@endif
+                </div>
+                <div class="notifications-info-wrapper">
+                    <div class="notifications-info-list" id="notificationsList">
+                        <ul>
+                            @forelse ($notifications as $notification)
+                            <li data-notification-id="{{ $notification->id }}" class="{{ $notification->read == 1 ? 'notification-read' : 'notification-unread' }}">
+                                <a class="list-item"
+                                    href="{{ route($notification->for.'.read-notification', $notification->id) }}">
+                                    <div class="icon">
+                                        <svg width="16" height="18" viewBox="0 0 16 18"
+                                            fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M8 18C9.38503 18 10.5633 17.1652 11 16H5C5.43668 17.1652 6.61497 18 8 18Z"
+                                                fill="url(#itemNotifGrad1-{{ $notification->id }})" />
+                                            <path opacity="0.4" fill-rule="evenodd"
+                                                clip-rule="evenodd"
+                                                d="M9.6896 0.754028C9.27403 0.291157 8.67102 0 8 0C6.74634 0 5.73005 1.01629 5.73005 2.26995V2.37366C3.58766 3.10719 2.0016 4.85063 1.76046 6.97519L1.31328 10.9153C1.23274 11.6249 0.933441 12.3016 0.447786 12.8721C-0.649243 14.1609 0.394434 16 2.22281 16H13.7772C15.6056 16 16.6492 14.1609 15.5522 12.8721C15.0666 12.3016 14.7673 11.6249 14.6867 10.9153L14.2395 6.97519C14.2333 6.92024 14.2262 6.86556 14.2181 6.81113C13.8341 6.93379 13.4248 7 13 7C10.7909 7 9 5.20914 9 3C9 2.16744 9.25436 1.3943 9.6896 0.754028Z"
+                                                fill="url(#itemNotifGrad2-{{ $notification->id }})" />
+                                            <defs>
+                                                <linearGradient id="itemNotifGrad1-{{ $notification->id }}" x1="5" y1="16" x2="11" y2="18" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#5cd2f7"/>
+                                                    <stop offset="1" stop-color="#1870f4"/>
+                                                </linearGradient>
+                                                <linearGradient id="itemNotifGrad2-{{ $notification->id }}" x1="0.447786" y1="0" x2="15.5522" y2="16" gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#5cd2f7" stop-opacity="0.7"/>
+                                                    <stop offset="1" stop-color="#1870f4" stop-opacity="0.7"/>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                    <div class="content">
+                                        <h5 class="title">
+                                            {{ $notification->notice }}
+                                        </h5>
+                                        <span class="info">{{ $notification->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </a>
+                               
+                            </li>
+                            @empty
+                            <li>
+                                <a href="#" class="list-item text-center">
+                                    <div class="content">
+                                        <h5 class="title">{{ __('No Notification Found!') }}</h5>
+                                    </div>
+                                </a>
+                            </li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+                @if($totalCount > 0)
+                <div class="notifications-bottom-content">
+                    <a class="notifications-btn"
+                        href="{{ route('user.notification.all') }}"><span>{{ __('See All Notification') }}</span></a>
+                </div>
+                @endif
+            </div>
         </div>
     </div>
-    @if($totalCount > 0)
-    <div class="notifications-bottom-content">
-        <a class="notifications-btn"
-            href="{{ route('user.notification.all') }}"><span>{{ __('See All Notification') }}</span></a>
-    </div>
-    @endif
-</div>
-</div>
-</div>
 </li>
 <li>
 <!--<div class="language-box">-->
@@ -159,73 +186,158 @@ data-bs-toggle="dropdown" aria-expanded="false">
 <div class="dropdown-info-list">
     <ul>
         <li>
-            <a href="{{ route('user.setting.show') }}">
-                <div class="content">
-                    <div class="icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path opacity="0.4"
-                                d="M12.9545 3H11.0455C9.99109 3 9.13635 3.80589 9.13635 4.8C9.13635 5.93761 7.91917 6.66087 6.92 6.11697L6.81852 6.06172C5.90541 5.56467 4.73782 5.85964 4.21064 6.72057L3.25609 8.27942C2.72891 9.14034 3.04176 10.2412 3.95487 10.7383C4.95451 11.2824 4.95451 12.7176 3.95487 13.2617C3.04176 13.7588 2.72891 14.8597 3.25609 15.7206L4.21064 17.2794C4.73782 18.1404 5.90541 18.4353 6.81851 17.9383L6.92 17.883C7.91917 17.3391 9.13635 18.0624 9.13635 19.2C9.13635 20.1941 9.99109 21 11.0455 21H12.9545C14.0089 21 14.8636 20.1941 14.8636 19.2C14.8636 18.0624 16.0808 17.3391 17.08 17.883L17.1815 17.9383C18.0946 18.4353 19.2622 18.1403 19.7894 17.2794L20.7439 15.7206C21.2711 14.8596 20.9582 13.7588 20.0451 13.2617C19.0455 12.7176 19.0455 11.2824 20.0451 10.7383C20.9582 10.2412 21.2711 9.14036 20.7439 8.27943L19.7894 6.72058C19.2622 5.85966 18.0946 5.56468 17.1815 6.06174L17.08 6.11698C16.0808 6.66088 14.8636 5.93762 14.8636 4.8C14.8636 3.80589 14.0089 3 12.9545 3Z"
-                                fill="white" />
-                            <circle cx="12" cy="12" r="3" fill="white" />
-                        </svg>
-                    </div>
-                    <div class="info">
-                        <span>{{ __('Settings') }}</span>
-                    </div>
-                </div>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('user.change.password') }}">
-                <div class="content">
-                    <div class="icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M8.75 6C8.75 4.20507 10.2051 2.75 12 2.75C13.7949 2.75 15.25 4.20507 15.25 6V8H16C16.2563 8 16.5071 8.02411 16.75 8.0702V6C16.75 3.37665 14.6234 1.25 12 1.25C9.37665 1.25 7.25 3.37665 7.25 6V8.0702C7.49294 8.02411 7.74365 8 8 8H8.75V6Z"
-                                fill="white" />
-                            <path opacity="0.4"
-                                d="M4 12C4 9.79086 5.79086 8 8 8H16C18.2091 8 20 9.79086 20 12V18C20 20.2091 18.2091 22 16 22H8C5.79086 22 4 20.2091 4 18V12Z"
-                                fill="white" />
-                            <circle cx="12" cy="15" r="2" fill="white" />
-                        </svg>
-                    </div>
-                    <div class="info">
-                        <span>{{ __('Change Password') }}</span>
-                    </div>
-                </div>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('user.ticket.index') }}">
-                <div class="content">
-                    <div class="icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M10.7188 16.5899L13.6905 21.243C14.1205 21.9163 15.0042 22.132 15.696 21.7326C16.4363 21.3052 16.6675 20.3448 16.2029 19.6273L13.7755 15.8789L10.7188 16.5899Z"
-                                fill="white" />
-                            <path opacity="0.4"
-                                d="M12.5144 3.98319C13.4304 2.99743 15.0388 3.17923 15.7116 4.34456L20.0037 11.7787C20.6765 12.944 20.0297 14.4279 18.7181 14.7282L7.80074 17.2675L4.80074 12.0713L12.5144 3.98319Z"
-                                fill="white" />
-                            <path
-                                d="M7.84766 16.7268L5.34766 12.3967C4.93344 11.6793 4.01606 11.4334 3.29862 11.8477C2.58118 12.2619 2.33537 13.1793 2.74958 13.8967L5.24958 18.2268C5.66379 18.9443 6.58118 19.1901 7.29862 18.7759C8.01606 18.3616 8.26187 17.4443 7.84766 16.7268Z"
-                                fill="white" />
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M20.0143 2.73953C20.4144 2.84673 20.6519 3.25799 20.5447 3.65809L20.1787 5.02411C20.0714 5.42421 19.6602 5.66165 19.2601 5.55444C18.86 5.44724 18.6226 5.03598 18.7298 4.63588L19.0958 3.26986C19.203 2.86976 19.6142 2.63232 20.0143 2.73953Z"
-                                fill="white" />
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M20.7298 8.09994C20.837 7.69984 21.2482 7.4624 21.6483 7.56961L23.0143 7.93563C23.4144 8.04284 23.6519 8.45409 23.5447 8.85419C23.4375 9.25429 23.0262 9.49173 22.6261 9.38452L21.2601 9.01849C20.86 8.91129 20.6226 8.50004 20.7298 8.09994Z"
-                                fill="white" />
-                        </svg>
-                    </div>
-                    <div class="info">
-                        <span>{{ __('Support Tickets') }}</span>
-                    </div>
-                </div>
-            </a>
-        </li>
+    <a href="{{ route('user.setting.show') }}">
+        <div class="content">
+            <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path opacity="0.4"
+                        d="M12.9545 3H11.0455C9.99109 3 9.13635 3.80589 9.13635 4.8C9.13635 5.93761 7.91917 6.66087 6.92 6.11697L6.81852 6.06172C5.90541 5.56467 4.73782 5.85964 4.21064 6.72057L3.25609 8.27942C2.72891 9.14034 3.04176 10.2412 3.95487 10.7383C4.95451 11.2824 4.95451 12.7176 3.95487 13.2617C3.04176 13.7588 2.72891 14.8597 3.25609 15.7206L4.21064 17.2794C4.73782 18.1404 5.90541 18.4353 6.81851 17.9383L6.92 17.883C7.91917 17.3391 9.13635 18.0624 9.13635 19.2C9.13635 20.1941 9.99109 21 11.0455 21H12.9545C14.0089 21 14.8636 20.1941 14.8636 19.2C14.8636 18.0624 16.0808 17.3391 17.08 17.883L17.1815 17.9383C18.0946 18.4353 19.2622 18.1403 19.7894 17.2794L20.7439 15.7206C21.2711 14.8596 20.9582 13.7588 20.0451 13.2617C19.0455 12.7176 19.0455 11.2824 20.0451 10.7383C20.9582 10.2412 21.2711 9.14036 20.7439 8.27943L19.7894 6.72058C19.2622 5.85966 18.0946 5.56468 17.1815 6.06174L17.08 6.11698C16.0808 6.66088 14.8636 5.93762 14.8636 4.8C14.8636 3.80589 14.0089 3 12.9545 3Z"
+                        fill="url(#settingsGradient1)" />
+                    <circle cx="12" cy="12" r="3" fill="url(#settingsGradient2)" />
+                    <defs>
+                        <linearGradient id="settingsGradient1" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7" stop-opacity="0.7"/>
+                            <stop offset="1" stop-color="#1870f4" stop-opacity="0.7"/>
+                        </linearGradient>
+                        <linearGradient id="settingsGradient2" x1="9" y1="9" x2="15" y2="15" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="info">
+                <span>{{ __('Settings') }}</span>
+            </div>
+        </div>
+    </a>
+</li>
+      <li>
+    <a href="{{ route('user.change.password') }}">
+        <div class="content">
+            <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M8.75 6C8.75 4.20507 10.2051 2.75 12 2.75C13.7949 2.75 15.25 4.20507 15.25 6V8H16C16.2563 8 16.5071 8.02411 16.75 8.0702V6C16.75 3.37665 14.6234 1.25 12 1.25C9.37665 1.25 7.25 3.37665 7.25 6V8.0702C7.49294 8.02411 7.74365 8 8 8H8.75V6Z"
+                        fill="url(#passwordGradient1)" />
+                    <path opacity="0.4"
+                        d="M4 12C4 9.79086 5.79086 8 8 8H16C18.2091 8 20 9.79086 20 12V18C20 20.2091 18.2091 22 16 22H8C5.79086 22 4 20.2091 4 18V12Z"
+                        fill="url(#passwordGradient2)" />
+                    <circle cx="12" cy="15" r="2" fill="url(#passwordGradient3)" />
+                    <defs>
+                        <linearGradient id="passwordGradient1" x1="7.25" y1="1.25" x2="16.75" y2="8" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                        <linearGradient id="passwordGradient2" x1="4" y1="8" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7" stop-opacity="0.7"/>
+                            <stop offset="1" stop-color="#1870f4" stop-opacity="0.7"/>
+                        </linearGradient>
+                        <linearGradient id="passwordGradient3" x1="10" y1="13" x2="14" y2="17" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="info">
+                <span>{{ __('Change Password') }}</span>
+            </div>
+        </div>
+    </a>
+</li>
+<li>
+    <a href="{{ route('user.referral') }}">
+        <div class="content">
+            <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="10" cy="8" r="4" fill="url(#refGradient1)" />
+                    <path d="M2 20C2 16.5 5.5 14 10 14C14.5 14 18 16.5 18 20"
+                        fill="url(#refGradient2)" opacity="0.7"/>
+
+                    <!-- plus icon -->
+                    <path d="M19 8V14M16 11H22"
+                        stroke="url(#refGradient3)"
+                        stroke-width="2"
+                        stroke-linecap="round"/>
+
+                    <defs>
+                        <linearGradient id="refGradient1" x1="6" y1="4" x2="14" y2="12">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+
+                        <linearGradient id="refGradient2" x1="2" y1="14" x2="18" y2="20">
+                            <stop stop-color="#5cd2f7" stop-opacity="0.6"/>
+                            <stop offset="1" stop-color="#1870f4" stop-opacity="0.6"/>
+                        </linearGradient>
+
+                        <linearGradient id="refGradient3" x1="16" y1="8" x2="22" y2="14">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="info">
+                <span>{{ __('Invite Friends') }}</span>
+            </div>
+        </div>
+    </a>
+</li>
+      <li>
+    <a href="{{ route('user.ticket.index') }}">
+        <div class="content">
+            <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M10.7188 16.5899L13.6905 21.243C14.1205 21.9163 15.0042 22.132 15.696 21.7326C16.4363 21.3052 16.6675 20.3448 16.2029 19.6273L13.7755 15.8789L10.7188 16.5899Z"
+                        fill="url(#ticketGradient1)" />
+                    <path opacity="0.4"
+                        d="M12.5144 3.98319C13.4304 2.99743 15.0388 3.17923 15.7116 4.34456L20.0037 11.7787C20.6765 12.944 20.0297 14.4279 18.7181 14.7282L7.80074 17.2675L4.80074 12.0713L12.5144 3.98319Z"
+                        fill="url(#ticketGradient2)" />
+                    <path
+                        d="M7.84766 16.7268L5.34766 12.3967C4.93344 11.6793 4.01606 11.4334 3.29862 11.8477C2.58118 12.2619 2.33537 13.1793 2.74958 13.8967L5.24958 18.2268C5.66379 18.9443 6.58118 19.1901 7.29862 18.7759C8.01606 18.3616 8.26187 17.4443 7.84766 16.7268Z"
+                        fill="url(#ticketGradient3)" />
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M20.0143 2.73953C20.4144 2.84673 20.6519 3.25799 20.5447 3.65809L20.1787 5.02411C20.0714 5.42421 19.6602 5.66165 19.2601 5.55444C18.86 5.44724 18.6226 5.03598 18.7298 4.63588L19.0958 3.26986C19.203 2.86976 19.6142 2.63232 20.0143 2.73953Z"
+                        fill="url(#ticketGradient4)" />
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M20.7298 8.09994C20.837 7.69984 21.2482 7.4624 21.6483 7.56961L23.0143 7.93563C23.4144 8.04284 23.6519 8.45409 23.5447 8.85419C23.4375 9.25429 23.0262 9.49173 22.6261 9.38452L21.2601 9.01849C20.86 8.91129 20.6226 8.50004 20.7298 8.09994Z"
+                        fill="url(#ticketGradient5)" />
+                    <defs>
+                        <linearGradient id="ticketGradient1" x1="10.7188" y1="15.8789" x2="16.2029" y2="21.243" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                        <linearGradient id="ticketGradient2" x1="4.80074" y1="3.98319" x2="20.0037" y2="17.2675" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7" stop-opacity="0.7"/>
+                            <stop offset="1" stop-color="#1870f4" stop-opacity="0.7"/>
+                        </linearGradient>
+                        <linearGradient id="ticketGradient3" x1="2.74958" y1="11.8477" x2="7.84766" y2="18.7759" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                        <linearGradient id="ticketGradient4" x1="18.7298" y1="2.73953" x2="20.5447" y2="5.55444" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                        <linearGradient id="ticketGradient5" x1="20.7298" y1="7.56961" x2="23.5447" y2="9.38452" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5cd2f7"/>
+                            <stop offset="1" stop-color="#1870f4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="info">
+                <span>{{ __('Support Tickets') }}</span>
+            </div>
+        </div>
+    </a>
+</li>
     </ul>
 </div>
 <div class="user-logout">
@@ -252,5 +364,7 @@ data-bs-toggle="dropdown" aria-expanded="false">
 </div>
 </div>
 </div>
+</div>
+</div></div>
 </div>
 </div>

@@ -204,14 +204,14 @@
 		input[type="date"],
 		textarea {
 			padding: 0px 15px 0 15px;
-			background: rgba(166deg, var(--td-primary) 0%, #231818 100%);
+			background: linear-gradient(90deg, #c6ff37 0%, #38ff9c 100%);
 			border: 1px solid rgba($white, $alpha: .08);
 			outline: none;
 			height: 50px;
 			width: 50px;
 			text-align: center;
 			font-size: 16px;
-			color: var(--td-white);
+			color: linear-gradient(90deg, #c6ff37 0%, #38ff9c 100%);
 			@include border-radius(6px);
 			&:focus {
 				border-color: var(--td-primary);

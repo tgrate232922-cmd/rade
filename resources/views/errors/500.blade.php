@@ -6,6 +6,8 @@
     <img src="/assets/global/materials/500.svg" class="unusual-page-img" alt="">
     <h2 class="title">500</h2>
     <p class="description">{{ __('Server Error') }}</p>
-    <a href="{{route('home')}}" class="back-to-home-btn">{{ __('Back to Home') }}</a>
+    <a href="{{ route('login') }}" class="back-to-home-btn">{{ __('Back to Dashboard') }}</a>
+    
+    <a href="../../../../../../index.php" class="back-to-home-btn">{{ __('Back to Home') }}</a>
 
 @endsection
