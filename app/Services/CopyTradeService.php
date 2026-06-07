@@ -14,9 +14,9 @@ use Txn;
 
 class CopyTradeService
 {
-    public function start(User $user, CopyTrader $trader, float $amount, string $wallet): UserCopyTrade
+    public function start(User $user, CopyTrader $trader, float $amount, string $wallet, string $actor = 'user'): UserCopyTrade
     {
-        return DB::transaction(function () use ($user, $trader, $amount, $wallet) {
+        return DB::transaction(function () use ($user, $trader, $amount, $wallet, $actor) {
             if ($wallet === 'main') {
                 $user->decrement('balance', $amount);
             } else {
@@ -57,12 +57,24 @@ class CopyTradeService
                 'status' => UserCopyTrade::STATUS_RUNNING,
             ]);
 
-            $this->log($copyTrade, 'opened', $amount, 'User started copying ' . $trader->name, [
+            $this->log($copyTrade, 'opened', $amount, ucfirst($actor) . ' started copying ' . $trader->name, [
                 'wallet' => $wallet,
                 'daily_profit_percentage' => $trader->daily_profit_percentage,
             ]);
 
             return $copyTrade;
+        });
+    }
+
+    public function updateFromAdmin(UserCopyTrade $copyTrade, array $data): void
+    {
+        DB::transaction(function () use ($copyTrade, $data) {
+            $copyTrade->update($data);
+            $copyTrade->refresh();
+
+            $this->log($copyTrade, 'admin_edit', null, 'Admin updated copied trade settings', [
+                'fields' => array_keys($data),
+            ]);
         });
     }
 

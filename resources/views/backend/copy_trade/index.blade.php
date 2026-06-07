@@ -12,6 +12,9 @@
                             <h2 class="title">
                                 {{ $selectedTrader ? __('Users Copying') . ' ' . $selectedTrader->name : __('All Copy Trades') }}
                             </h2>
+                            <a href="{{ route('admin.copy-trades.create') }}" class="title-btn">
+                                <i icon-name="plus-circle"></i>{{ __('Add User Copy') }}
+                            </a>
                             <a href="{{ route('admin.copy-traders.index') }}" class="title-btn">
                                 <i icon-name="users"></i>{{ __('Manage Traders') }}
                             </a>
@@ -89,6 +92,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex flex-wrap gap-1">
+                                                    <a href="{{ route('admin.copy-trades.edit', $copyTrade->id) }}" class="site-btn-sm primary-btn">{{ __('Edit') }}</a>
                                                     @if($copyTrade->status === \App\Models\UserCopyTrade::STATUS_RUNNING)
                                                         <form action="{{ route('admin.copy-trades.pause', $copyTrade->id) }}" method="post">
                                                             @csrf
