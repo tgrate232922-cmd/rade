@@ -114,6 +114,8 @@ class CopyTradeController extends Controller
             'next_profit_at' => 'nullable|date',
             'last_profit_at' => 'nullable|date',
             'completed_at' => 'nullable|date',
+            'trader_display_users_copying' => 'required|integer|min:0',
+            'trader_win_rate' => 'required|numeric|min:0|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -139,6 +141,11 @@ class CopyTradeController extends Controller
                 ? ($this->dateOrNull($request->completed_at) ?: Carbon::now())
                 : $this->dateOrNull($request->completed_at),
         ];
+
+        CopyTrader::where('id', $request->copy_trader_id)->update([
+            'display_users_copying' => $request->trader_display_users_copying,
+            'win_rate' => $request->trader_win_rate,
+        ]);
 
         $this->copyTradeService->updateFromAdmin($copyTrade, $data);
 

@@ -56,12 +56,16 @@
                                                         data-min="{{ $trader->min_amount }}"
                                                         data-max="{{ $trader->max_amount }}"
                                                         data-duration="{{ $trader->duration_days }}"
+                                                        data-users-copying="{{ $trader->display_users_copying }}"
+                                                        data-win-rate="{{ $trader->win_rate }}"
                                                         @selected(old('copy_trader_id') == $trader->id)
                                                     >
                                                         {{ $trader->name }} -
                                                         {{ $trader->daily_profit_percentage }}% {{ __('daily') }},
                                                         {{ $currencySymbol }}{{ $trader->min_amount }}-{{ $currencySymbol }}{{ $trader->max_amount }},
-                                                        {{ ucfirst($trader->risk_level) }} {{ __('Risk') }}
+                                                        {{ ucfirst($trader->risk_level) }} {{ __('Risk') }},
+                                                        {{ $trader->win_rate }}% {{ __('Win Rate') }},
+                                                        {{ $trader->display_users_copying }} {{ __('Users Copying') }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -93,6 +97,8 @@
                                         <div class="site-card mb-3">
                                             <div class="site-card-body">
                                                 <p class="mb-1">{{ __('Estimated Daily Profit') }}: <strong id="daily-profit-preview">0 {{ $currency }}</strong></p>
+                                                <p class="mb-1">{{ __('Trader Users Copying') }}: <strong id="users-copying-preview">0</strong></p>
+                                                <p class="mb-1">{{ __('Trader Win Rate') }}: <strong id="win-rate-preview">0%</strong></p>
                                                 <p class="mb-0">{{ __('Admin-created copy trades debit the selected wallet immediately and create an investment transaction/log.') }}</p>
                                             </div>
                                         </div>
@@ -119,10 +125,14 @@
             const percent = parseFloat(selected.getAttribute('data-daily-profit') || 0);
             const min = selected.getAttribute('data-min');
             const max = selected.getAttribute('data-max');
+            const usersCopying = selected.getAttribute('data-users-copying') || 0;
+            const winRate = selected.getAttribute('data-win-rate') || 0;
             const dailyProfit = ((amount * percent) / 100).toFixed(2);
 
             document.getElementById('daily-profit-preview').innerText = dailyProfit + ' {{ $currency }}';
             document.getElementById('trader-range').innerText = min && max ? '{{ __('Allowed range') }}: {{ $currencySymbol }}' + min + ' - {{ $currencySymbol }}' + max : '';
+            document.getElementById('users-copying-preview').innerText = usersCopying;
+            document.getElementById('win-rate-preview').innerText = winRate + '%';
         }
 
         document.getElementById('copy-trader-select').addEventListener('change', calculateDailyProfit);

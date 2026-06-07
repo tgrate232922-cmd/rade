@@ -34,6 +34,7 @@
                                         <th>{{ __('Amount') }}</th>
                                         <th>{{ __('Duration') }}</th>
                                         <th>{{ __('Risk') }}</th>
+                                        <th>{{ __('Win Rate') }}</th>
                                         <th>{{ __('Status') }}</th>
                                         <th>{{ __('Users') }}</th>
                                         <th>{{ __('Action') }}</th>
@@ -51,12 +52,14 @@
                                             <td>{{ $currencySymbol }}{{ $trader->min_amount }} - {{ $currencySymbol }}{{ $trader->max_amount }}</td>
                                             <td>{{ $trader->duration_days }} {{ __('Days') }}</td>
                                             <td>{{ ucfirst($trader->risk_level) }}</td>
+                                            <td>{{ $trader->win_rate }}%</td>
                                             <td>
                                                 <span class="site-badge {{ $trader->status ? 'success' : 'danger' }}">
                                                     {{ $trader->status ? __('Active') : __('Inactive') }}
                                                 </span>
                                             </td>
                                             <td>
+                                                {{ __('Display') }}: {{ $trader->display_users_copying }}<br>
                                                 <a href="{{ route('admin.copy-trades.index', $trader->id) }}">
                                                     {{ $trader->running_copied_trades_count }} {{ __('running') }}
                                                 </a>

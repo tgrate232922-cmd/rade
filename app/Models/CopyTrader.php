@@ -18,6 +18,8 @@ class CopyTrader extends Model
         'capital_return' => 'boolean',
         'status' => 'boolean',
         'approved' => 'boolean',
+        'display_users_copying' => 'integer',
+        'win_rate' => 'decimal:2',
     ];
 
     public function copiedTrades()

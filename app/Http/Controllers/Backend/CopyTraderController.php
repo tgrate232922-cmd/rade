@@ -87,6 +87,8 @@ class CopyTraderController extends Controller
             'status' => 'required|boolean',
             'approved' => 'required|boolean',
             'risk_level' => 'required|in:low,medium,high',
+            'display_users_copying' => 'required|integer|min:0',
+            'win_rate' => 'required|numeric|min:0|max:100',
             'description' => 'nullable|string',
         ]);
     }
@@ -103,6 +105,8 @@ class CopyTraderController extends Controller
             'status' => $request->status,
             'approved' => $request->approved,
             'risk_level' => $request->risk_level,
+            'display_users_copying' => $request->display_users_copying,
+            'win_rate' => $request->win_rate,
             'description' => $request->description,
         ];
 

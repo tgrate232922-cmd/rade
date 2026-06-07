@@ -49,7 +49,8 @@
                         <li>{{ __('Maximum Amount') }}: <strong>{{ $currencySymbol }}{{ $trader->max_amount }}</strong></li>
                         <li>{{ __('Duration') }}: <strong>{{ $trader->duration_days }} {{ __('Days') }}</strong></li>
                         <li>{{ __('Capital Return') }}: <strong>{{ $trader->capital_return ? __('Yes') : __('No') }}</strong></li>
-                        <li>{{ __('Users Copying') }}: <strong>{{ $trader->running_copied_trades_count }}</strong></li>
+                        <li>{{ __('Users Copying') }}: <strong>{{ $trader->display_users_copying }}</strong></li>
+                        <li>{{ __('Trader Win Rate') }}: <strong>{{ $trader->win_rate }}%</strong></li>
                     </ul>
 
                     <form action="{{ route('user.copy-trade.store') }}" method="post" class="mt-3">

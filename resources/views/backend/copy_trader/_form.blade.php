@@ -84,6 +84,23 @@
         </div>
     </div>
 
+    <div class="col-xl-6">
+        <div class="site-input-groups">
+            <label class="box-input-label">{{ __('Users Copying') }}</label>
+            <input type="number" min="0" name="display_users_copying" class="box-input" value="{{ old('display_users_copying', $copyTrader?->display_users_copying ?? 0) }}" required>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="site-input-groups">
+            <label class="box-input-label">{{ __('Trader Win Rate') }}</label>
+            <div class="input-group joint-input">
+                <input type="text" name="win_rate" class="form-control" oninput="this.value = validateDouble(this.value)" value="{{ old('win_rate', $copyTrader?->win_rate ?? 0) }}" required>
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+    </div>
+
     <div class="col-xl-4">
         <div class="site-input-groups">
             <label class="box-input-label">{{ __('Capital Return') }}</label>

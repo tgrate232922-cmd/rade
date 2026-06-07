@@ -50,6 +50,8 @@
                                                     <option
                                                         value="{{ $trader->id }}"
                                                         data-daily-profit="{{ $trader->daily_profit_percentage }}"
+                                                        data-users-copying="{{ $trader->display_users_copying }}"
+                                                        data-win-rate="{{ $trader->win_rate }}"
                                                         @selected(old('copy_trader_id', $copyTrade->copy_trader_id) == $trader->id)
                                                     >
                                                         {{ $trader->name }} - {{ $trader->daily_profit_percentage }}% {{ __('daily') }} - {{ ucfirst($trader->risk_level) }} {{ __('Risk') }}
@@ -85,6 +87,25 @@
                                         <div class="site-input-groups">
                                             <label class="box-input-label">{{ __('Daily Profit %') }}</label>
                                             <input type="text" id="daily-profit-percentage" name="daily_profit_percentage" class="box-input" oninput="this.value = validateDouble(this.value); calculateDailyProfit();" value="{{ old('daily_profit_percentage', $copyTrade->daily_profit_percentage) }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6">
+                                        <div class="site-input-groups">
+                                            <label class="box-input-label">{{ __('Trader Users Copying') }}</label>
+                                            <input type="number" min="0" id="trader-users-copying" name="trader_display_users_copying" class="box-input" value="{{ old('trader_display_users_copying', $copyTrade->trader->display_users_copying ?? 0) }}" required>
+                                            <small>{{ __('This updates the selected trader card display.') }}</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-6">
+                                        <div class="site-input-groups">
+                                            <label class="box-input-label">{{ __('Trader Win Rate') }}</label>
+                                            <div class="input-group joint-input">
+                                                <input type="text" id="trader-win-rate" name="trader_win_rate" class="form-control" oninput="this.value = validateDouble(this.value)" value="{{ old('trader_win_rate', $copyTrade->trader->win_rate ?? 0) }}" required>
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                            <small>{{ __('This updates the selected trader card display.') }}</small>
                                         </div>
                                     </div>
 
@@ -190,5 +211,15 @@
             const dailyProfit = ((amount * percent) / 100).toFixed(2);
             document.getElementById('daily-profit-amount').value = dailyProfit;
         }
+
+        function syncTraderDisplayFields() {
+            const trader = document.getElementById('copy-trader-select');
+            const selected = trader.options[trader.selectedIndex];
+
+            document.getElementById('trader-users-copying').value = selected.getAttribute('data-users-copying') || 0;
+            document.getElementById('trader-win-rate').value = selected.getAttribute('data-win-rate') || 0;
+        }
+
+        document.getElementById('copy-trader-select').addEventListener('change', syncTraderDisplayFields);
     </script>
 @endsection
