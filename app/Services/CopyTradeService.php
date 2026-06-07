@@ -8,12 +8,15 @@ use App\Models\CopyTradeLog;
 use App\Models\CopyTrader;
 use App\Models\User;
 use App\Models\UserCopyTrade;
+use App\Traits\NotifyTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Txn;
 
 class CopyTradeService
 {
+    use NotifyTrait;
+
     public function start(User $user, CopyTrader $trader, float $amount, string $wallet, string $actor = 'user'): UserCopyTrade
     {
         return DB::transaction(function () use ($user, $trader, $amount, $wallet, $actor) {
@@ -61,6 +64,10 @@ class CopyTradeService
                 'wallet' => $wallet,
                 'daily_profit_percentage' => $trader->daily_profit_percentage,
             ]);
+
+            $this->mailNotify($user->email, 'copy_trade_started', $this->shortcodes($copyTrade, [
+                '[[txn]]' => $transaction->tnx,
+            ]));
 
             return $copyTrade;
         });
@@ -142,10 +149,12 @@ class CopyTradeService
             'completed_at' => Carbon::now(),
         ]);
 
+        $transaction = null;
+
         if ($copyTrade->capital_return) {
             $copyTrade->user->increment('balance', $copyTrade->amount_copied);
 
-            Txn::new(
+            $transaction = Txn::new(
                 $copyTrade->amount_copied,
                 0,
                 $copyTrade->amount_copied,
@@ -162,6 +171,10 @@ class CopyTradeService
         $this->log($copyTrade, 'closed', null, ucfirst($actor) . ' completed this copied trade', [
             'capital_return' => $copyTrade->capital_return,
         ]);
+
+        $this->mailNotify($copyTrade->user->email, 'copy_trade_completed', $this->shortcodes($copyTrade, [
+            '[[txn]]' => $transaction?->tnx ?? 'N/A',
+        ]));
     }
 
     public function adjust(UserCopyTrade $copyTrade, float $amount, string $message = null): void
@@ -205,7 +218,7 @@ class CopyTradeService
         $copyTrade->increment('periods_paid');
         $copyTrade->update(['last_profit_at' => Carbon::now()]);
 
-        Txn::new(
+        $transaction = Txn::new(
             $amount,
             0,
             $amount,
@@ -220,6 +233,10 @@ class CopyTradeService
 
         $this->log($copyTrade, 'daily_profit', $amount, 'Daily copy-trade profit credited');
         $copyTrade->refresh();
+
+        $this->mailNotify($copyTrade->user->email, 'copy_trade_profit', $this->shortcodes($copyTrade, [
+            '[[txn]]' => $transaction->tnx,
+        ]));
     }
 
     private function log(UserCopyTrade $copyTrade, string $type, ?float $amount, ?string $message, array $meta = []): void
@@ -233,5 +250,25 @@ class CopyTradeService
             'message' => $message,
             'meta' => $meta ?: null,
         ]);
+    }
+
+    private function shortcodes(UserCopyTrade $copyTrade, array $extra = []): array
+    {
+        $currency = setting('site_currency', 'global');
+
+        return array_merge([
+            '[[full_name]]' => $copyTrade->user->full_name,
+            '[[trader_name]]' => $copyTrade->trader->name,
+            '[[amount]]' => $copyTrade->amount_copied . ' ' . $currency,
+            '[[daily_profit]]' => $copyTrade->daily_profit_amount . ' ' . $currency,
+            '[[total_profit]]' => $copyTrade->total_profit_earned . ' ' . $currency,
+            '[[daily_profit_percentage]]' => $copyTrade->daily_profit_percentage,
+            '[[duration]]' => $copyTrade->duration_days,
+            '[[start_date]]' => $copyTrade->start_date?->format('M d, Y H:i') ?? '-',
+            '[[end_date]]' => $copyTrade->end_date?->format('M d, Y H:i') ?? '-',
+            '[[txn]]' => 'N/A',
+            '[[site_title]]' => setting('site_title', 'global'),
+            '[[site_url]]' => route('home'),
+        ], $extra);
     }
 }
