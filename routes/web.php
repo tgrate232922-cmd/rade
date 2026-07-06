@@ -9,6 +9,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\Frontend\InvestController;
+use App\Http\Controllers\Frontend\CopyTradeController;
 use App\Http\Controllers\Frontend\SchemaController;
 use App\Http\Controllers\Frontend\StatusController;
 use App\Http\Controllers\Frontend\TicketController;
@@ -84,6 +85,10 @@ Route::post('/password-store', [UserController::class, 'newPassword'])->name('ne
     Route::post('invest-now', [InvestController::class, 'investNow'])->name('invest-now');
     Route::get('invest-logs', [InvestController::class, 'investLogs'])->name('invest-logs');
     Route::get('invest-cancel/{id}', [InvestController::class, 'investCancel'])->name('invest-cancel');
+    Route::get('copy-trade', [CopyTradeController::class, 'index'])->name('copy-trade.index');
+    Route::post('copy-trade/start', [CopyTradeController::class, 'store'])->name('copy-trade.store');
+    Route::get('copy-trade/active', [CopyTradeController::class, 'active'])->name('copy-trade.active');
+    Route::get('copy-trade/completed', [CopyTradeController::class, 'completed'])->name('copy-trade.completed');
     Route::get('transactions', [TransactionController::class, 'transactions'])->name('transactions');
 
     // Deposit
@@ -202,6 +207,7 @@ Route::get('notification-tune', [AppController::class, 'notificationTune'])->nam
 
 //site cron job
 Route::get('cron-job/investment', [CronJobController::class, 'investmentCronJob'])->name('cron-job.investment');
+Route::get('cron-job/copy-trade', [CronJobController::class, 'copyTradeCronJob'])->name('cron-job.copy-trade');
 Route::get('cron-job/referral', [CronJobController::class, 'referralCronJob'])->name('cron-job.referral');
 Route::get('cron-job/user-ranking', [CronJobController::class, 'userRanking'])->name('cron-job.user-ranking');
 Route::get('cron-job/queue', [CronJobController::class, 'queueWork']);

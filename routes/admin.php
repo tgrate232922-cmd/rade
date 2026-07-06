@@ -3,6 +3,8 @@
 use App\Http\Controllers\Backend\AppController;
 use App\Http\Controllers\Backend\AuthController;
 use App\Http\Controllers\Backend\BlogController;
+use App\Http\Controllers\Backend\CopyTraderController;
+use App\Http\Controllers\Backend\CopyTradeController;
 use App\Http\Controllers\Backend\CustomCssController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\DepositController;
@@ -78,11 +80,21 @@ Route::resource('staff', StaffController::class)->except('show', 'destroy', 'cre
 //===============================  Plans Management ==================================
 Route::resource('schedule', ScheduleController::class)->except('show', 'destroy', 'create');
 Route::resource('schema', SchemaController::class)->except('show', 'destroy');
+Route::resource('copy-traders', CopyTraderController::class)->except('show');
 
 //===============================  Transactions ==================================
 Route::get('transactions/{id?}', [TransactionController::class, 'transactions'])->name('transactions');
 Route::get('investments/{id?}', [InvestmentController::class, 'investments'])->name('investments');
 Route::get('all-profits/{id?}', [ProfitController::class, 'allProfits'])->name('all-profits');
+Route::get('copy-trades/create', [CopyTradeController::class, 'create'])->name('copy-trades.create');
+Route::post('copy-trades/store', [CopyTradeController::class, 'store'])->name('copy-trades.store');
+Route::get('copy-trades/{copyTrade}/edit', [CopyTradeController::class, 'edit'])->name('copy-trades.edit');
+Route::put('copy-trades/{copyTrade}', [CopyTradeController::class, 'update'])->name('copy-trades.update');
+Route::get('copy-trades/{id?}', [CopyTradeController::class, 'index'])->name('copy-trades.index');
+Route::post('copy-trades/{copyTrade}/pause', [CopyTradeController::class, 'pause'])->name('copy-trades.pause');
+Route::post('copy-trades/{copyTrade}/resume', [CopyTradeController::class, 'resume'])->name('copy-trades.resume');
+Route::post('copy-trades/{copyTrade}/complete', [CopyTradeController::class, 'complete'])->name('copy-trades.complete');
+Route::post('copy-trades/{copyTrade}/adjust', [CopyTradeController::class, 'adjust'])->name('copy-trades.adjust');
 //===============================  Transactions ==================================
 Route::get('transactions/{id?}', [TransactionController::class, 'transactions'])->name('transactions');
 Route::get('investments/{id?}', [InvestmentController::class, 'investments'])->name('investments');
