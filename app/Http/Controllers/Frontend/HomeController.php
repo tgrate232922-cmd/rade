@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\LandingPage;
 use App\Models\Subscription;
 use App\Models\Theme;
+use App\Services\CrawlerDetector;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Psr\Container\ContainerExceptionInterface;
@@ -15,9 +17,8 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class HomeController extends Controller
 {
-    public function home()
+    public function home(CrawlerDetector $crawlerDetector)
     {
-
         $customLandingTheme = Theme::where('type', 'landing')->where('status', true)->first();
         if ($customLandingTheme) {
             return view('landing_theme.' . $customLandingTheme->name);
@@ -26,16 +27,38 @@ class HomeController extends Controller
         $redirectPage = setting('home_redirect', 'global');
 
         if ($redirectPage == '/') {
-            $homeContent = LandingPage::where('status', true)->whereNot('code', 'footer')->where('locale', app()->getLocale())->orderBy('short')->get();
+            if ($this->isHomeBotProtectionEnabled()) {
+                if ($crawlerDetector->isCrawler()) {
+                    return response()
+                        ->view('frontend::home.crawler')
+                        ->header('X-Robots-Tag', 'noindex, nofollow');
+                }
 
-            return view('frontend::home.index', compact('homeContent'));
+                return view('frontend::home.shell');
+            }
+
+            return view('frontend::home.index', [
+                'homeContent' => $this->getHomeContent(),
+            ]);
         }
 
         return redirect($redirectPage);
-
     }
 
-    /**
+    public function content(CrawlerDetector $crawlerDetector): Response
+    {
+        if (!$this->isHomeBotProtectionEnabled() || $crawlerDetector->isCrawler()) {
+            abort(403);
+        }
+
+        return response()
+            ->view('frontend::home._sections', [
+                'homeContent' => $this->getHomeContent(),
+            ])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+  /**
      * @return RedirectResponse
      */
     public function subscribeNow(Request $request)
@@ -95,5 +118,19 @@ class HomeController extends Controller
         $value = $request->input('value');
         session([$key => $value]);
         return response()->json(['success' => true]);
+    }
+
+    private function isHomeBotProtectionEnabled(): bool
+    {
+        return (bool) setting('home_bot_protection', 'permission', false);
+    }
+
+    private function getHomeContent()
+    {
+        return LandingPage::where('status', true)
+            ->whereNot('code', 'footer')
+            ->where('locale', app()->getLocale())
+            ->orderBy('short')
+            ->get();
     }
 }

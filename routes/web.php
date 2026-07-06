@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Artisan;
 
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
+Route::get('home/content', [HomeController::class, 'content'])->name('home.content');
 Route::post('subscriber', [HomeController::class, 'subscribeNow'])->name('subscriber');
 
 //Static Page
