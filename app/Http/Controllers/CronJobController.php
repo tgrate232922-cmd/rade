@@ -14,6 +14,8 @@ use App\Models\ReferralRelationship;
 use App\Models\Schema;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserCopyTrade;
+use App\Services\CopyTradeService;
 use App\Traits\NotifyTrait;
 use Artisan;
 use Carbon\Carbon;
@@ -22,6 +24,10 @@ use Txn;
 class CronJobController extends Controller
 {
     use NotifyTrait;
+
+    public function __construct(private CopyTradeService $copyTradeService)
+    {
+    }
 
     /**
      * @return string
@@ -120,6 +126,17 @@ class CronJobController extends Controller
         }
 
         return '....cron job successfully completed';
+    }
+
+    public function copyTradeCronJob()
+    {
+        $copyTrades = UserCopyTrade::with(['user', 'trader'])->dueForProfit()->cursor();
+
+        foreach ($copyTrades as $copyTrade) {
+            $this->copyTradeService->accrueDueProfit($copyTrade);
+        }
+
+        return '....copy trade cron job successfully completed';
     }
 
     /**

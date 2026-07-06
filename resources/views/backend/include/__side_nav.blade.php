@@ -99,11 +99,11 @@
             @endcanany
 
             {{-- *************************************************************  Plan Management *********************************************************--}}
-            @canany(['schedule-manage','schema-list','schema-create','schema-edit'])
+            @canany(['schedule-manage','schema-list','schema-create','schema-edit','copy-trader-list','copy-trader-create','copy-trader-edit'])
                 <li class="side-nav-item category-title">
                     <span>{{ __('Plans') }}</span>
                 </li>
-                <li class="side-nav-item side-nav-dropdown {{ isActive(['admin.schedule*','admin.schema*']) }}">
+                <li class="side-nav-item side-nav-dropdown {{ isActive(['admin.schedule*','admin.schema*','admin.copy-traders*']) }}">
                     <a href="javascript:void(0);" class="dropdown-link"><i
                             icon-name="album"></i><span>{{ __('Manage Schema') }}</span>
                         <span class="right-arrow"><i icon-name="chevron-down"></i></span></a>
@@ -121,12 +121,19 @@
                             </li>
                         @endcan
 
+                        @canany(['schema-edit','copy-trader-list','copy-trader-create','copy-trader-edit'])
+                            <li class="side-nav-item {{ isActive('admin.copy-traders*') }}">
+                                <a href="{{route('admin.copy-traders.index')}}"><i
+                                        icon-name="copy"></i><span>{{ __('Copy Traders') }}</span></a>
+                            </li>
+                        @endcanany
+
                     </ul>
                 </li>
             @endcanany
 
             {{-- *************************************************************  Transactions *********************************************************--}}
-            @canany(['transaction-list','investment-list','profit-list'])
+            @canany(['transaction-list','investment-list','profit-list','copy-trade-monitor'])
                 <li class="side-nav-item category-title">
                     <span>{{ __('Transactions') }}</span>
                 </li>
@@ -148,6 +155,12 @@
                                 icon-name="credit-card"></i><span>{{ __('User Profits') }}</span></a>
                     </li>
                 @endcan
+                @canany(['investment-list','copy-trade-monitor'])
+                    <li class="side-nav-item {{ isActive('admin.copy-trades*') }}">
+                        <a href="{{route('admin.copy-trades.index')}}"><i
+                                icon-name="line-chart"></i><span>{{ __('Copy Trades') }}</span></a>
+                    </li>
+                @endcanany
             @endcanany
 
             {{-- *************************************************************  Essentials *********************************************************--}}
