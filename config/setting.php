@@ -230,6 +230,14 @@ return [
             [
                 'type' => 'checkbox', // input fields type
                 'data' => 'boolean', // data type, string, int, boolean
+                'name' => 'home_bot_protection', // unique name for field
+                'label' => 'Home Page Bot Protection', // you know what label it is
+                'rules' => 'required', // validation rule of laravel
+                'value' => 0, // default value if you want
+            ],
+            [
+                'type' => 'checkbox', // input fields type
+                'data' => 'boolean', // data type, string, int, boolean
                 'name' => 'debug_mode', // unique name for field
                 'label' => 'Development Mode', // you know what label it is
                 'rules' => 'required', // validation rule of laravel
