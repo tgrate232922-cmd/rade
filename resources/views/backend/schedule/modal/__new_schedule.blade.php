@@ -29,17 +29,23 @@
                             />
                         </div>
                         <div class="site-input-groups">
-                            <label for="" class="box-input-label">{{ __('Schedule In Hours:') }}</label
-                            >
+                            <label for="" class="box-input-label">{{ __('Schedule Interval:') }}</label>
                             <div class="input-group joint-input">
                                 <input
                                     type="text"
                                     name="time"
                                     class="form-control"
-                                    placeholder="Ex: 24"
+                                    placeholder="Ex: 5"
                                     onkeypress="return validateNumber(event)"
                                 />
-                                <span class="input-group-text">{{ __('Hour') }}</span>
+                                <select name="time_unit" class="form-select">
+                                    <option value="instantly">{{ __('Instantly') }}</option>
+                                    <option value="seconds">{{ __('Seconds') }}</option>
+                                    <option value="minutes">{{ __('Minutes') }}</option>
+                                    <option value="hours" selected>{{ __('Hours') }}</option>
+                                    <option value="days">{{ __('Days') }}</option>
+                                    <option value="months">{{ __('Months') }}</option>
+                                </select>
                             </div>
                         </div>
 

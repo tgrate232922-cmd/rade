@@ -16,6 +16,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserCopyTrade;
 use App\Services\CopyTradeService;
+use App\Support\ScheduleInterval;
 use App\Traits\NotifyTrait;
 use Artisan;
 use Carbon\Carbon;
@@ -50,7 +51,8 @@ class CronJobController extends Controller
                 $calculateInterest = ($invest->interest * $invest->invest_amount) / 100;
                 $interest = $invest->interest_type != 'percentage' ? $invest->interest : $calculateInterest;
 
-                $nextProfitTime = Carbon::now()->addHour($invest->period_hours);
+                $periodSeconds = $invest->period_seconds ?? ScheduleInterval::toSeconds((int) $invest->period_hours, 'hours');
+                $nextProfitTime = ScheduleInterval::addInterval(Carbon::now(), $periodSeconds);
 
                 $updateData = [
                     'next_profit_time' => $nextProfitTime,

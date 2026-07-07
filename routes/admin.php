@@ -58,6 +58,7 @@ Route::group(['prefix' => 'user', 'as' => 'user.', 'controller' => UserControlle
     Route::post('status-update/{id}', 'statusUpdate')->name('status-update');
     Route::post('password-update/{id}', 'passwordUpdate')->name('password-update');
     Route::post('balance-update/{id}', 'balanceUpdate')->name('balance-update');
+    Route::post('schema-limits/{id}', 'updateSchemaLimits')->name('schema-limits.update');
     Route::get('mail-send/all', 'mailSendAll')->name('mail-send.all');
     Route::post('mail-send', 'mailSend')->name('mail-send');
     Route::get('transaction/{id}', 'transaction')->name('transaction');
@@ -79,7 +80,8 @@ Route::resource('staff', StaffController::class)->except('show', 'destroy', 'cre
 
 //===============================  Plans Management ==================================
 Route::resource('schedule', ScheduleController::class)->except('show', 'destroy', 'create');
-Route::resource('schema', SchemaController::class)->except('show', 'destroy');
+Route::resource('schema', SchemaController::class)->except('show');
+Route::post('schema/{schema}/end', [SchemaController::class, 'end'])->name('schema.end');
 Route::resource('copy-traders', CopyTraderController::class)->except('show');
 
 //===============================  Transactions ==================================
@@ -301,5 +303,3 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout')->withou
         Route::delete('investments/{invest}', [InvestmentController::class, 'destroy'])
             ->name('investments.destroy');
     
-Route::post('user/{user}/notification', [NotificationController::class, 'storeUserNotification'])
-    ->name('user.notification.store');

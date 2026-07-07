@@ -41,10 +41,12 @@ class PermissionSeeder extends Seeder
             ['category' => 'Plan Management', 'name' => 'schema-list'],
             ['category' => 'Plan Management', 'name' => 'schema-create'],
             ['category' => 'Plan Management', 'name' => 'schema-edit'],
+            ['category' => 'Plan Management', 'name' => 'schema-delete'],
             ['category' => 'Plan Management', 'name' => 'copy-trader-list'],
             ['category' => 'Plan Management', 'name' => 'copy-trader-create'],
             ['category' => 'Plan Management', 'name' => 'copy-trader-edit'],
             ['category' => 'Plan Management', 'name' => 'copy-trader-delete'],
+            ['category' => 'Plan Management', 'name' => 'customer-schema-limit'],
 
             ['category' => 'Transaction Management', 'name' => 'transaction-list'],
             ['category' => 'Transaction Management', 'name' => 'investment-list'],

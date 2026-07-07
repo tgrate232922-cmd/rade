@@ -12,6 +12,7 @@ use App\Models\Gateway;
 use App\Models\Invest;
 use App\Models\LevelReferral;
 use App\Models\Transaction;
+use App\Support\ScheduleInterval;
 use App\Traits\ImageUpload;
 use App\Traits\NotifyTrait;
 use Carbon\Carbon;
@@ -190,12 +191,12 @@ if ($wallet !== '') {
     $paymentDetails =
         '<!-- WALLET_WIDGET_START -->' .
         '<div class="wallet-widget" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#f9fafb;margin:10px 0;">' .
-        '  <div style="font-size:13px;color:#fff;margin-bottom:6px;"><small>Please complete your deposit using the wallet address below:</small></div>' .
+        '  <div style="font-size:13px;color:#196ed2;margin-bottom:6px;"><small>Please complete your deposit using the ' . e($assetLabel) . ' wallet address below:</small></div>' .
         '  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' .
         '    <span class="wallet-address" data-wallet="' . e($wallet) . '" style="font-family:monospace;font-size:13px;word-break:break-all;">' . e($wallet) . '</span>' .
         '    <button type="button" class="copy-btn" style="background:#196ed2;color:#fff;padding:6px 10px;border:0;border-radius:4px;font-size:12px;">📋 Copy</button>' .
         '  </div>' .
-        '  <div style="font-size:12px;color:#fff;margin-top:8px;"><small>After sending, upload your payment proof in the section below.</small></div>' .
+        '  <div style="font-size:12px;color:#475569;margin-top:8px;"><small>After sending, upload your payment proof in the section below.</small></div>' .
         '</div>' .
         '<!-- WALLET_WIDGET_END -->';
 
@@ -318,8 +319,8 @@ if ($wallet !== '') {
 
             if ($transaction->type == TxnType::Investment) {
                 $invest = Invest::where('transaction_id', $id)->first();
-                $periodHours = $invest->period_hours;
-                $nextProfitTime = Carbon::now()->addHour($periodHours);
+                $periodSeconds = $invest->period_seconds ?? ScheduleInterval::toSeconds((int) $invest->period_hours, 'hours');
+                $nextProfitTime = ScheduleInterval::addInterval(Carbon::now(), $periodSeconds);
                 $invest->update([
                     'next_profit_time' => $nextProfitTime,
                     'status' => InvestStatus::Ongoing,

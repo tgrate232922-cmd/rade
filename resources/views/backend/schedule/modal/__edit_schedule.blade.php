@@ -30,10 +30,17 @@
                             />
                         </div>
                         <div class="site-input-groups">
-                            <label for="" class="box-input-label">{{ __('Schedule In Hours:') }}</label>
+                            <label for="" class="box-input-label">{{ __('Schedule Interval:') }}</label>
                             <div class="input-group joint-input">
                                 <input type="text" class="form-control" name="time" id="time"/>
-                                <span class="input-group-text" id="time-level">{{ __('Hours') }}</span>
+                                <select name="time_unit" class="form-select" id="time-unit">
+                                    <option value="instantly">{{ __('Instantly') }}</option>
+                                    <option value="seconds">{{ __('Seconds') }}</option>
+                                    <option value="minutes">{{ __('Minutes') }}</option>
+                                    <option value="hours">{{ __('Hours') }}</option>
+                                    <option value="days">{{ __('Days') }}</option>
+                                    <option value="months">{{ __('Months') }}</option>
+                                </select>
                             </div>
                         </div>
 
