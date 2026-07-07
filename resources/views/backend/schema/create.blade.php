@@ -202,7 +202,12 @@
                                                 placeholder="Total Repeat Time"
                                                 required
                                             />
-                                            <span class="input-group-text">{{ __('Times') }}</span>
+                                            <select name="period_unit" class="form-select">
+                                                <option value="times">{{ __('Times') }}</option>
+                                                <option value="minutes">{{ __('Minutes') }}</option>
+                                                <option value="hours">{{ __('Hours') }}</option>
+                                                <option value="days">{{ __('Days') }}</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

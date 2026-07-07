@@ -71,8 +71,26 @@
                                                        class="round-icon-btn primary-btn">
                                                         <i icon-name="edit-3"></i>
                                                     </a>
+                                                    @if($schema->status)
+                                                        <form action="{{ route('admin.schema.end', $schema->id) }}" method="post" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="round-icon-btn red-btn"
+                                                                    onclick="return confirm('{{ __('End this plan and close active investments?') }}')">
+                                                                <i icon-name="square"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 @endcan
-
+                                                @can('schema-delete')
+                                                    <form action="{{ route('admin.schema.destroy', $schema->id) }}" method="post" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="round-icon-btn red-btn"
+                                                                onclick="return confirm('{{ __('Delete this plan permanently?') }}')">
+                                                            <i icon-name="trash-2"></i>
+                                                        </button>
+                                                    </form>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach

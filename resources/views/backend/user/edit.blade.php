@@ -60,16 +60,6 @@
                                        data-bs-original-title="Fund Add or Subtract">
                                     <i icon-name="wallet"></i></a></span>
                                 @endcan
-                                
-                                @can('customer-post-notification')
-    <span type="button" data-bs-toggle="modal" data-bs-target="#postNotification">
-        <a href="javascript:void(0);" class="site-btn-round green-btn"
-           data-bs-toggle="tooltip" title=""
-           data-bs-original-title="Post Notification">
-            <i icon-name="bell"></i>
-        </a>
-    </span>
-@endcan
                             </div>
                         </div>
                         <div class="site-card">
@@ -158,6 +148,8 @@
                                 </li>
                             @endcan
 
+                            @include('backend.user.include.__schema_limits_tab')
+
                             @can('profit-list')
                                 <li class="nav-item" role="presentation">
                                     <a
@@ -231,6 +223,8 @@
                             @include('backend.user.include.__basic_info')
                         @endcanany
 
+                        @include('backend.user.include.__schema_limits')
+
 
                         <!-- investments -->
                         @can('investment-list')
@@ -276,48 +270,4 @@
     @endcan
     <!-- Modal for Add or Subtract Balance End-->
 
-
-@can('customer-post-notification')
-<div class="modal fade" id="postNotification" tabindex="-1" aria-labelledby="postNotificationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content site-table-modal">
-            <div class="modal-body popup-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <form action="{{ route('admin.user.notification.store', $user->id) }}" method="POST">
-                    @csrf
-                    <div class="popup-body-text">
-                        <h3 class="title mb-3">{{ __('Post Notification') }}</h3>
-
-                        <div class="site-input-groups">
-                            <label class="box-input-label">{{ __('Title') }}</label>
-                            <input type="text" name="title" class="box-input" required>
-                        </div>
-
-                        <div class="site-input-groups">
-                            <label class="box-input-label">{{ __('Message') }}</label>
-                            <textarea name="notice" class="form-textarea" rows="8" required></textarea>
-                        </div>
-
-                       <div class="site-input-groups">
-    <label class="box-input-label">{{ __('Continue Button Page') }}</label>
-    <select name="action_page" class="form-select" required>
-        <option value="dashboard">{{ __('Dashboard') }}</option>
-        <option value="withdraw">{{ __('Withdraw') }}</option>
-        <option value="transactions">{{ __('Transactions') }}</option>
-        <option value="schema">{{ __('Invest') }}</option>
-        <option value="referral">{{ __('Referral') }}</option>
-        <option value="ticket">{{ __('Ticket') }}</option>
-    </select>
-</div>
-
-                        <button type="submit" class="site-btn-sm primary-btn w-100">
-                            {{ __('Send Notification') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-@endcan
 @endsection

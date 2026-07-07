@@ -149,18 +149,18 @@
                                 icon-name="anchor"></i><span>{{ __('Investments') }}</span></a>
                     </li>
                 @endcan
+                @canany(['investment-list','copy-trade-monitor'])
+                    <li class="side-nav-item {{ isActive('admin.copy-trades*') }}">
+                        <a href="{{route('admin.copy-trades.index')}}"><i
+                                icon-name="trending-up"></i><span>{{ __('Copy Trades') }}</span></a>
+                    </li>
+                @endcanany
                 @can('profit-list')
                     <li class="side-nav-item {{ isActive('admin.all-profits') }}">
                         <a href="{{route('admin.all-profits')}}"><i
                                 icon-name="credit-card"></i><span>{{ __('User Profits') }}</span></a>
                     </li>
                 @endcan
-                @canany(['investment-list','copy-trade-monitor'])
-                    <li class="side-nav-item {{ isActive('admin.copy-trades*') }}">
-                        <a href="{{route('admin.copy-trades.index')}}"><i
-                                icon-name="line-chart"></i><span>{{ __('Copy Trades') }}</span></a>
-                    </li>
-                @endcanany
             @endcanany
 
             {{-- *************************************************************  Essentials *********************************************************--}}

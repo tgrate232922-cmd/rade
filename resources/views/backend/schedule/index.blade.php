@@ -45,7 +45,7 @@
                                             <td>{{++$loop->index}}</td>
                                             <td>{{$schedule->name}}</td>
                                             <td>
-                                                <strong>{{$schedule->time}} @php echo $schedule->time > 1 ? 'Hours' : 'Hour' @endphp</strong>
+                                                <strong>{{ \App\Support\ScheduleInterval::scheduleLabel((int) $schedule->time, $schedule->time_unit ?? 'hours') }}</strong>
                                             </td>
                                             <td>
                                                 <button
@@ -95,11 +95,7 @@
 
                 $('#name').val(data.name);
                 $('#time').val(data.time);
-                if (data.time <= 1) {
-                    $('#time-level').html('Hour');
-                } else {
-                    $('#time-level').html('Hours');
-                }
+                $('#time-unit').val(data.time_unit ?? 'hours');
             })
         });
 

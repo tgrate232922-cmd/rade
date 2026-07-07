@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invest;
+use App\Support\ScheduleInterval;
 use DataTables;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -94,7 +95,11 @@ class InvestmentController extends Controller
                 if ($raw->return_type != 'period') {
                     return 'Unlimited';
                 }
-                return $raw->number_of_period . ($raw->number_of_period < 2 ? ' Time' : ' Times');
+
+                return ScheduleInterval::periodLabel(
+                    (int) $raw->number_of_period,
+                    $raw->period_unit ?? 'times'
+                );
             })
             ->editColumn('capital_back', 'backend.investment.include.__invest_capital_back')
             ->editColumn('next_profit_time', 'backend.investment.include.__invest_next_profit_time')

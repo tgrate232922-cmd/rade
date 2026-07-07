@@ -4,47 +4,35 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Schedule;
+use App\Support\ScheduleInterval;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ScheduleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('permission:schedule-manage');
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Application|Factory|View
-     */
-    public function index()
+    public function index(): Application|Factory|View
     {
         $schedules = Schedule::all()->sortBy('time');
 
         return view('backend.schedule.index', compact('schedules'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return RedirectResponse
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'time' => 'required|integer',
+            'time' => 'required|integer|min:0',
+            'time_unit' => ['required', Rule::in(ScheduleInterval::SCHEDULE_UNITS)],
         ]);
 
         if ($validator->fails()) {
@@ -52,35 +40,24 @@ class ScheduleController extends Controller
 
             return redirect()->back();
         }
-        Schedule::create($request->all());
+
+        Schedule::create($request->only('name', 'time', 'time_unit'));
         notify()->success('Schedule created successfully');
 
         return redirect()->route('admin.schedule.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return array
-     */
-    public function edit($id)
+    public function edit($id): Schedule
     {
         return Schedule::find($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param int $id
-     * @return RedirectResponse
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): RedirectResponse
     {
-
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'time' => 'required|integer',
+            'time' => 'required|integer|min:0',
+            'time_unit' => ['required', Rule::in(ScheduleInterval::SCHEDULE_UNITS)],
         ]);
 
         if ($validator->fails()) {
@@ -89,8 +66,8 @@ class ScheduleController extends Controller
             return redirect()->back();
         }
 
-        $Schedule = Schedule::find($id);
-        $Schedule->update($request->all());
+        $schedule = Schedule::find($id);
+        $schedule->update($request->only('name', 'time', 'time_unit'));
 
         notify()->success('Schedule updated successfully');
 

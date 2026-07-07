@@ -216,7 +216,13 @@
                                                 placeholder="Total Repeat Time"
                                                 required
                                             />
-                                            <span class="input-group-text">{{ __('Times') }}</span>
+                                            <span class="input-group-text d-none">{{ __('Times') }}</span>
+                                            <select name="period_unit" class="form-select">
+                                                <option value="times" @selected(($schema->period_unit ?? 'times') === 'times')>{{ __('Times') }}</option>
+                                                <option value="minutes" @selected($schema->period_unit === 'minutes')>{{ __('Minutes') }}</option>
+                                                <option value="hours" @selected($schema->period_unit === 'hours')>{{ __('Hours') }}</option>
+                                                <option value="days" @selected($schema->period_unit === 'days')>{{ __('Days') }}</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

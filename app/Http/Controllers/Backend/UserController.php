@@ -6,8 +6,10 @@ use App\Enums\TxnStatus;
 use App\Enums\TxnType;
 use App\Http\Controllers\Controller;
 use App\Models\LevelReferral;
+use App\Models\Schema;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserSchemaLimit;
 use App\Traits\NotifyTrait;
 use DataTables;
 use Exception;
@@ -41,6 +43,7 @@ class UserController extends Controller
         $this->middleware('permission:customer-change-password', ['only' => ['passwordUpdate']]);
         $this->middleware('permission:all-type-status', ['only' => ['statusUpdate']]);
         $this->middleware('permission:customer-balance-add-or-subtract', ['only' => ['balanceUpdate']]);
+        $this->middleware('permission:customer-schema-limit', ['only' => ['updateSchemaLimits']]);
     }
 
     /**
@@ -155,8 +158,45 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $level = LevelReferral::where('type', 'investment')->max('the_order') + 1;
+        $schemas = Schema::orderBy('name')->get(['id', 'name']);
+        $schemaLimits = UserSchemaLimit::with('schema')->where('user_id', $id)->get();
 
-        return view('backend.user.edit', compact('user', 'level'));
+        return view('backend.user.edit', compact('user', 'level', 'schemas', 'schemaLimits'));
+    }
+
+    public function updateSchemaLimits(Request $request, $id): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'limits' => 'nullable|array',
+            'limits.*.schema_id' => 'required_with:limits.*.max_subscriptions|exists:schemas,id',
+            'limits.*.max_subscriptions' => 'required_with:limits.*.schema_id|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            notify()->error($validator->errors()->first(), 'Error');
+
+            return redirect()->back();
+        }
+
+        UserSchemaLimit::where('user_id', $user->id)->delete();
+
+        foreach ($request->input('limits', []) as $limit) {
+            if (empty($limit['schema_id']) || empty($limit['max_subscriptions'])) {
+                continue;
+            }
+
+            UserSchemaLimit::create([
+                'user_id' => $user->id,
+                'schema_id' => $limit['schema_id'],
+                'max_subscriptions' => $limit['max_subscriptions'],
+            ]);
+        }
+
+        notify()->success(__('Plan subscription limits updated successfully.'));
+
+        return redirect()->back();
     }
 
     /**
